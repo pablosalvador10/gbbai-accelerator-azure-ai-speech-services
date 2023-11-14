@@ -10,8 +10,8 @@ ipython
 # core azure ai development
 promptflow 
 promptflow-tools
-azureml-sdk
-azure-core==1.29.5
-azure-mgmt-authorization==4.0.0
+azure-cognitiveservices-speech
+azure-ai-ml
+azure-identity
 
-#more specialized packages ai azure services -> https://azure.github.io/azure-sdk/releases/latest/all/python.html
+# more specialized packages ai azure services -> https://azure.github.io/azure-sdk/releases/latest/all/python.html

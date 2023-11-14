@@ -94,7 +94,10 @@ test_reffiting_hydra_multirun:
 	$(call log_section,Running model refitting using Hydra with specified date)
 	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components_hydra.py --multirun pipeline_settings.date="'14_10_2023'","'14_12_2023'"
 
-
 run_pylint:
 	@echo "Running linter"
 	find . -type f -name "*.py" ! -path "./tests/*" | xargs pylint -disable=logging-fstring-interpolation > utils/pylint_report/pylint_report.txt
+
+create_conda_env:
+	@echo "Creating conda environment"
+	conda env create -f environment.yml
