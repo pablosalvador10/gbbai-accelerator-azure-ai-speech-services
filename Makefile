@@ -104,10 +104,15 @@ create_conda_env:
 
 test_speech_to_text_lilly_raw: 
 	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 test_speech_to_text_lilly_processed: 
 	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
+	@echo "Done"
+
+test_speech_to_text_intent_processed: 
+	@echo "Runnng Speach to text services adn intent recognition"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
 	@echo "Done"

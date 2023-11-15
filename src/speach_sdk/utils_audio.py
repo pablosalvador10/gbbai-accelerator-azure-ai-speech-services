@@ -5,7 +5,7 @@ from pydub import AudioSegment
 from pydub.utils import mediainfo
 logger = get_logger()
 
-def log_audio_characteristics(file_name: str) -> Optional[None]:
+def log_audio_characteristics(file_name: str):
     """
     Logs the characteristics of an audio file.
 
@@ -21,25 +21,21 @@ def log_audio_characteristics(file_name: str) -> Optional[None]:
         return
 
     try:
+        # Load audio file directly without converting to a different format
         audio = AudioSegment.from_file(file_name)
-        base_name, _ = os.path.splitext(file_name)
-        pcm_file_name = base_name + ".pcm"
 
-        audio.export(pcm_file_name, format="wav")
-        info = mediainfo(pcm_file_name)
+        # Log basic audio information
+        logger.info(f"Audio file characteristics for {file_name}:")
+        logger.info(f"Number of channels: {audio.channels}")
 
-        logger.info(f"Audio file characteristics for {pcm_file_name}:")
-        logger.info(f"Number of channels: {info['channels']}")
-        if info['bits_per_sample'].isdigit():
-            sample_width = int(info['bits_per_sample']) / 8
-            logger.info(f"Sample width (bytes): {sample_width}")
-        else:
-            logger.error("Invalid bits_per_sample value")
-        logger.info(f"Sampling frequency (Hz): {info['sample_rate']}")
-        if info['duration'].replace('.', '', 1).isdigit() and info['sample_rate'].isdigit():
-            number_of_frames = int(float(info['duration']) * int(info['sample_rate']))
-            logger.info(f"Number of frames: {number_of_frames}")
-        else:
-            logger.error("Invalid duration or sample rate values")
+        sample_width = audio.sample_width
+        logger.info(f"Sample width (bytes): {sample_width}")
+
+        logger.info(f"Sampling frequency (Hz): {audio.frame_rate}")
+
+        # Calculate number of frames
+        number_of_frames = len(audio)
+        logger.info(f"Number of frames: {number_of_frames}")
+
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        logger.error(f"An error occurred while analyzing the audio file: {e}")

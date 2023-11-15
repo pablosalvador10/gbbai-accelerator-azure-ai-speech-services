@@ -13,5 +13,6 @@ promptflow-tools
 azure-cognitiveservices-speech
 azure-ai-ml
 azure-identity
+pydub
 
 # more specialized packages ai azure services -> https://azure.github.io/azure-sdk/releases/latest/all/python.html

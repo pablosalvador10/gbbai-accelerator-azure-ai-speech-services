@@ -87,15 +87,15 @@ def from_file_continous(file_name: str, key: str, region: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description='Transcribe speech from an audio file.')
-    parser.add_argument('file_name', type=str, help='The name of the audio file to transcribe.')
+    parser.add_argument("--file", required=True, help="The path to the audio file.")
     args = parser.parse_args()
     
     #TODO: Remote
-    if not os.path.isfile(args.file_name):
-        logger.error(f"File {args.file_name} not found.")
+    if not os.path.isfile(args.file):
+        logger.error(f"File {args.file} not found.")
         return
 
-    logger.info(from_file_continous(args.file_name, KEY, REGION))
+    logger.info(from_file_continous(args.file, KEY, REGION))
 
 if __name__ == '__main__':
     main()
