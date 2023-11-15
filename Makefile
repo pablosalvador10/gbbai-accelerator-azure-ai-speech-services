@@ -101,3 +101,8 @@ run_pylint:
 create_conda_env:
 	@echo "Creating conda environment"
 	conda env create -f environment.yml
+
+test_conda_env: 
+	@echo "Runnng Speach to text services"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_to_text/speach_to_text.py /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/aboutSpeechSdk.wav
+	@echo "Done"
