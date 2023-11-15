@@ -102,7 +102,12 @@ create_conda_env:
 	@echo "Creating conda environment"
 	conda env create -f environment.yml
 
-test_conda_env: 
+test_speech_to_text_lilly_raw: 
 	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_to_text/speach_to_text.py /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/aboutSpeechSdk.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Done"
+
+test_speech_to_text_lilly_processed: 
+	@echo "Runnng Speach to text services"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
 	@echo "Done"

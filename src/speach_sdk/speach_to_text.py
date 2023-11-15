@@ -2,13 +2,13 @@ import azure.cognitiveservices.speech as speechsdk
 import time 
 import os
 from utils.ml_logging import get_logger
+from src.speach_sdk.utils_audio import log_audio_characteristics
 import argparse
 from dotenv import load_dotenv
 load_dotenv()
 logger = get_logger()
 
-
-KEY = os.getenv('KEY')
+KEY = os.getenv('KEY_SPEACH')
 REGION = os.getenv('REGION')
 
 def from_file_async(file_name: str, key: str, region: str) -> str:
@@ -41,7 +41,6 @@ def from_file_async(file_name: str, key: str, region: str) -> str:
     return result.text
 
 
-
 def from_file_continous(file_name: str, key: str, region: str) -> str:
     """performs continuous speech recognition with input from an audio file"""
     # Set up logging
@@ -50,6 +49,8 @@ def from_file_continous(file_name: str, key: str, region: str) -> str:
     audio_config = speechsdk.audio.AudioConfig(filename=file_name)
 
     speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+    log_audio_characteristics(file_name)
 
     done = False
     final_text = ""
@@ -77,7 +78,7 @@ def from_file_continous(file_name: str, key: str, region: str) -> str:
     # Start continuous speech recognition
     speech_recognizer.start_continuous_recognition()
     while not done:
-        time.sleep(.1)
+        time.sleep(.01)
 
     speech_recognizer.stop_continuous_recognition()
 
