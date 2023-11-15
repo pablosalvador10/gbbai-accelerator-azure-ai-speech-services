@@ -6,12 +6,13 @@ from src.speach_sdk.utils_audio import log_audio_characteristics
 import argparse
 from dotenv import load_dotenv
 load_dotenv()
+
 logger = get_logger()
 
-KEY = os.getenv('KEY_SPEACH')
-REGION = os.getenv('REGION')
+SPEECH_KEY = os.getenv('KEY_SPEACH')
+SPEECH_REGION = os.getenv('REGION')
 
-def from_file_async(file_name: str, key: str, region: str) -> str:
+def transcribe_speech_from_file_async(file_name: str, key: str, region: str) -> str:
     """
     Transcribes speech from an audio file using Azure Cognitive Services Speech SDK.
 
@@ -40,8 +41,7 @@ def from_file_async(file_name: str, key: str, region: str) -> str:
             logger.error(f"Error details: {cancellation_details.error_details}")
     return result.text
 
-
-def from_file_continous(file_name: str, key: str, region: str) -> str:
+def transcribe_speech_from_file_continuous(file_name: str, key: str, region: str) -> str:
     """performs continuous speech recognition with input from an audio file"""
     # Set up logging
   
@@ -84,18 +84,19 @@ def from_file_continous(file_name: str, key: str, region: str) -> str:
 
     return final_text.strip() 
 
-
 def main():
     parser = argparse.ArgumentParser(description='Transcribe speech from an audio file.')
     parser.add_argument("--file", required=True, help="The path to the audio file.")
     args = parser.parse_args()
     
-    #TODO: Remote
     if not os.path.isfile(args.file):
         logger.error(f"File {args.file} not found.")
         return
 
-    logger.info(from_file_continous(args.file, KEY, REGION))
+    try:
+        logger.info(transcribe_speech_from_file_continuous(args.file, SPEECH_KEY, SPEECH_REGION))
+    except Exception as e:
+        logger.error(f"Failed to transcribe audio file: {e}")
 
 if __name__ == '__main__':
     main()
