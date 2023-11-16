@@ -62,6 +62,48 @@ def generate_text_completion(prompt: str, temperature: float = 0.5, max_tokens: 
     except openai.error.Timeout as e:
         logger.error(f"Request timed out: {e}")
 
+
+def generate_text_with_contextual_history(conversation_history, latest_prompt, temperature=0.7, max_tokens=800, deployment_name="foundational-35-turbo"):
+    """
+    Generates a text response using Foundation models from OpenAI, considering the conversation history as context but focusing on the latest prompt.
+    Ensures the AI always understands its role as an assistant.
+    """
+    try:
+        # Ensure the AI's role is always understood
+        system_message = {"role": "system", "content": "You are an AI assistant that helps people find information."}
+        if not conversation_history or conversation_history[0] != system_message:
+            conversation_history.insert(0, system_message)
+
+        # Prepare messages for the API request
+        messages_for_api = conversation_history + [{"role": "user", "content": latest_prompt}]
+
+        logger.info(f"Sending request to OpenAI with prompt: {latest_prompt}")
+
+        # Generate response
+        response = openai.ChatCompletion.create(
+            engine=deployment_name,
+            messages=messages_for_api,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        # Extract response content
+        response_content = response['choices'][0]['message']['content']
+
+        logger.info(f"Received response from OpenAI: {response_content}")
+
+        # Update conversation history with the AI's response
+        conversation_history.append({"role": "user", "content": latest_prompt})
+        conversation_history.append({"role": "system", "content": response_content})
+
+        return response_content
+
+    except openai.error.OpenAIError as e:
+        logger.error(f"OpenAI API returned an error: {e}")
+
 def transcribe_and_analyze_speech(): 
     """
     Transcribes speech from an audio file and analyzes it using OpenAI.
