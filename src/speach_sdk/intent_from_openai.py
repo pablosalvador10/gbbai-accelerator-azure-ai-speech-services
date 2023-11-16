@@ -5,6 +5,8 @@ from typing import Optional
 from utils.ml_logging import get_logger
 from src.speach_sdk.speach_to_text import transcribe_speech_from_file_continuous
 import openai
+from dotenv import load_dotenv
+load_dotenv()
 
 # Set up logger
 logger = get_logger()
@@ -73,18 +75,28 @@ def transcribe_and_analyze_speech():
     MAX_TOKENS = 100
 
     try:
-        prompt = transcribe_speech_from_file_continuous(args.file, SPEECH_KEY, SPEECH_REGION)
+        prompt = transcribe_speech_from_file_continuous(args.file, key=SPEECH_KEY, region=SPEECH_REGION)
+        logger.info(prompt)
     except Exception as e:
         logger.error(f"Failed to transcribe audio file: {e}")
         return
 
     try:
-        response = generate_text_completion(prompt, temperature=TEMPERATURE, max_tokens=MAX_TOKENS, deployment_name=deployment_name)
+        
+        if prompt is None: 
+            logger.error("Failed to transcribe audio file.")
+            return 
+
+        BASE_PROMPT = f'''Act as pharmaceutilcal expert and analyze the following conversation {prompt}, please
+        Focus on identifying the Intent/Goal from the customer related to their inquiry. 
+        After analyzing the conversation, provide a concise summary.'''
+
+        logger.info(f"Input Prompt: {BASE_PROMPT}")
+
+        response = generate_text_completion(BASE_PROMPT, temperature=TEMPERATURE, max_tokens=MAX_TOKENS, deployment_name=deployment_name)
     except Exception as e:
         logger.error(f"Failed to generate text completion: {e}")
         return
-
-    logger.info(response)
 
 
 if __name__ == '__main__':

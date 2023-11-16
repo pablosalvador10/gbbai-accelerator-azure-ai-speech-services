@@ -112,7 +112,7 @@ test_speech_to_text_lilly_processed:
 	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
 	@echo "Done"
 
-test_speech_to_text_intent_processed: 
+test_speech_to_text_intent_lenguage: 
 	@echo "Runnng Speach to text services adn intent recognition"
 	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
 	@echo "Done"

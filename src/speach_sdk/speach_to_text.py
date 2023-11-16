@@ -9,8 +9,8 @@ load_dotenv()
 
 logger = get_logger()
 
-SPEECH_KEY = os.getenv('KEY_SPEACH')
-SPEECH_REGION = os.getenv('REGION')
+SPEECH_KEY = os.getenv('SPEECH_KEY')
+SPEECH_REGION = os.getenv('SPEECH_REGION')
 
 def transcribe_speech_from_file_async(file_name: str, key: str, region: str) -> str:
     """
