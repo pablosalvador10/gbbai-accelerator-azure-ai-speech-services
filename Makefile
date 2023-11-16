@@ -69,31 +69,6 @@ OUTPUT_DIRECTORY= "/Users/salv91/Desktop/open-source/ml-project-template/noteboo
 
 ## run with Omegaconf + Click
 
-test_fe_passing_args:
-	$(call log_section,Running feature engineering with specified arguments)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/feature_engineering/components.py run-feature-engineering --input_path $(INPUT_PATH) --output_directory $(OUTPUT_DIRECTORY)
-
-test_fe_no_passing_args:
-	$(call log_section,Running feature engineering with default arguments)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/feature_engineering/components.py run-feature-engineering
-
-test_training_data_prep_args:
-	$(call log_section,Preparing training data with specified estimator and sampling techniques)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components.py run-training-data-prep --estimator "AdaBoostClassifier" --perform-sampling-techniques "upsampling"
-
-test_training:
-	$(call log_section,Training model with specified estimator)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components.py run-training --estimator "AdaBoost_upsampling"
-
-# Target for running refitting with Hydra
-test_reffiting_hydra:
-	$(call log_section,Running model refitting using Hydra with specified date)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components_hydra.py pipeline_settings.date="'14_10_2023'"
-
-test_reffiting_hydra_multirun:
-	$(call log_section,Running model refitting using Hydra with specified date)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components_hydra.py --multirun pipeline_settings.date="'14_10_2023'","'14_12_2023'"
-
 run_pylint:
 	@echo "Running linter"
 	find . -type f -name "*.py" ! -path "./tests/*" | xargs pylint -disable=logging-fstring-interpolation > utils/pylint_report/pylint_report.txt
@@ -104,20 +79,30 @@ create_conda_env:
 
 test_speech_to_text_lilly_raw: 
 	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
-	@echo "Done"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 
 test_speech_to_text_lilly_processed: 
 	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 test_speech_to_text_intent_lenguage: 
 	@echo "Runnng Speach to text services adn intent recognition"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 test_speech_to_text_intent_openai: 
 	@echo "Runnng Speach to text services adn intent recognition"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_openai.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_openai.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Done"
+
+## Create Conda environment from a particular location in the repo
+create_conda_env:
+	$(call log_section, Creating Conda environment)
+	conda env create -f $(PWD)/environment.yml
+
+## Create Conda environment from a particular location in the repo
+demo_text_to_speech_speachto_text_openai:
+	@echo "Runnng Speach to text services adn intent recognition"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/demo_app.py
 	@echo "Done"

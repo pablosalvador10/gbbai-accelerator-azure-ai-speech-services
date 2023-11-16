@@ -1,6 +1,7 @@
 import os
 import azure.cognitiveservices.speech as speechsdk
 from typing import Tuple, Optional
+from utils.ml_logging import get_logger
 from azure.cognitiveservices.speech import SpeechRecognitionResult
 
 # Set up logger
