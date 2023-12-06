@@ -1,9 +1,11 @@
-from typing import Optional
 import os
-from utils.ml_logging import get_logger
+
 from pydub import AudioSegment
-from pydub.utils import mediainfo
+
+from utils.ml_logging import get_logger
+
 logger = get_logger()
+
 
 def log_audio_characteristics(file_name: str):
     """

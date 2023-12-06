@@ -44,6 +44,4 @@ Eager to make significant contributions? Our **[CONTRIBUTING](./CONTRIBUTING.md)
 ┣ 📜 requirements.txt <- General project dependencies.
 ```
 
-##  👨🏽‍💻 System Design and Architecture
 
-## CI/CD

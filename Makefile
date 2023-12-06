@@ -69,31 +69,6 @@ OUTPUT_DIRECTORY= "/Users/salv91/Desktop/open-source/ml-project-template/noteboo
 
 ## run with Omegaconf + Click
 
-test_fe_passing_args:
-	$(call log_section,Running feature engineering with specified arguments)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/feature_engineering/components.py run-feature-engineering --input_path $(INPUT_PATH) --output_directory $(OUTPUT_DIRECTORY)
-
-test_fe_no_passing_args:
-	$(call log_section,Running feature engineering with default arguments)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/feature_engineering/components.py run-feature-engineering
-
-test_training_data_prep_args:
-	$(call log_section,Preparing training data with specified estimator and sampling techniques)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components.py run-training-data-prep --estimator "AdaBoostClassifier" --perform-sampling-techniques "upsampling"
-
-test_training:
-	$(call log_section,Training model with specified estimator)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components.py run-training --estimator "AdaBoost_upsampling"
-
-# Target for running refitting with Hydra
-test_reffiting_hydra:
-	$(call log_section,Running model refitting using Hydra with specified date)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components_hydra.py pipeline_settings.date="'14_10_2023'"
-
-test_reffiting_hydra_multirun:
-	$(call log_section,Running model refitting using Hydra with specified date)
-	$(PYTHON_INTERPRETER) $(PWD)/pipelines/training/components_hydra.py --multirun pipeline_settings.date="'14_10_2023'","'14_12_2023'"
-
 run_pylint:
 	@echo "Running linter"
 	find . -type f -name "*.py" ! -path "./tests/*" | xargs pylint -disable=logging-fstring-interpolation > utils/pylint_report/pylint_report.txt
@@ -102,17 +77,26 @@ create_conda_env:
 	@echo "Creating conda environment"
 	conda env create -f environment.yml
 
-test_speech_to_text_lilly_raw: 
+test_speech_to_text_raw_file: 
 	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+
+test_speech_to_text_processed_file: 
+	@echo "Runnng Speach to text services"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
-test_speech_to_text_lilly_processed: 
-	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
-	@echo "Done"
-
-test_speech_to_text_intent_processed: 
+test_speech_to_text_intent_lenguage: 
 	@echo "Runnng Speach to text services adn intent recognition"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file /mnt/c/Users/pablosal/Desktop/lilly-workshop-gbb-text-to-speach/notebooks/dev/8000khz-mulaw-pullstream/7.wav
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Done"
+
+test_speech_to_text_intent_openai: 
+	@echo "Runnng Speach to text services adn intent recognition"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_openai.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Done"
+
+demo_app_speach_to_text_to_speach:
+	@echo "Runnng Speach to text services adn intent recognition"
+	$(PYTHON_INTERPRETER) $(PWD)/src/demo_app.py
 	@echo "Done"
