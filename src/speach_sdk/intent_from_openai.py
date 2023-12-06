@@ -6,7 +6,7 @@ from typing import Optional
 import openai
 from dotenv import load_dotenv
 
-from src.speach_sdk.speach_to_text import transcribe_speech_from_file_continuous
+from src.speech_sdk.speech_to_text import transcribe_speech_from_file_continuous
 from utils.ml_logging import get_logger
 
 load_dotenv()
@@ -19,7 +19,7 @@ SPEECH_KEY = os.getenv("SPEECH_KEY")
 SPEECH_REGION = os.getenv("SPEECH_REGION")
 
 # Load config values
-with open(r"src/speach_sdk/aoai_config.json") as config_file:
+with open(r"src/speech_sdk/aoai_config.json") as config_file:
     config_details = json.load(config_file)
 
 # Set up OpenAI API

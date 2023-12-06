@@ -1,4 +1,4 @@
-name: speach-ai-azure-services
+name: speech-ai-azure-services
 channels:
   - conda-forge
   - defaults

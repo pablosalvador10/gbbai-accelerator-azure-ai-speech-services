@@ -64,10 +64,6 @@ define log_section
 	@printf "\n${GREEN}--> $(1)${NC}\n\n"
 endef
 
-INPUT_PATH= "/Users/salv91/Desktop/open-source/ml-project-template/utils/data/BankChurners.csv"
-OUTPUT_DIRECTORY= "/Users/salv91/Desktop/open-source/ml-project-template/notebooks/dev/test"
-
-## run with Omegaconf + Click
 
 run_pylint:
 	@echo "Running linter"
@@ -78,25 +74,20 @@ create_conda_env:
 	conda env create -f environment.yml
 
 test_speech_to_text_raw_file: 
-	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
-
-test_speech_to_text_processed_file: 
-	@echo "Runnng Speach to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
-	@echo "Done"
+	@echo "Runnng speech to text services"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/speech_to_text.py --file C:\Users\pablosal\Desktop\gbbai-accelerator-azure-ai-speech-services\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 
 test_speech_to_text_intent_lenguage: 
-	@echo "Runnng Speach to text services adn intent recognition"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_lenguage.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Runnng speech to text services adn intent recognition"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/intent_from_lenguage.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 test_speech_to_text_intent_openai: 
-	@echo "Runnng Speach to text services adn intent recognition"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_openai.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Runnng speech to text services adn intent recognition"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/intent_from_openai.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
-demo_app_speach_to_text_to_speach:
-	@echo "Runnng Speach to text services adn intent recognition"
+demo_app_speech_to_text_to_speech:
+	@echo "Runnng speech to text services adn intent recognition"
 	$(PYTHON_INTERPRETER) $(PWD)/src/demo_app.py
 	@echo "Done"
