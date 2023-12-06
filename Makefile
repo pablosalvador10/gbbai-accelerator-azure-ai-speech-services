@@ -64,7 +64,6 @@ define log_section
 	@printf "\n${GREEN}--> $(1)${NC}\n\n"
 endef
 
-
 run_pylint:
 	@echo "Running linter"
 	find . -type f -name "*.py" ! -path "./tests/*" | xargs pylint -disable=logging-fstring-interpolation > utils/pylint_report/pylint_report.txt
@@ -74,20 +73,20 @@ create_conda_env:
 	conda env create -f environment.yml
 
 test_speech_to_text_raw_file: 
-	@echo "Runnng speech to text services"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/speech_to_text.py --file C:\Users\pablosal\Desktop\gbbai-accelerator-azure-ai-speech-services\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+	@echo "Runnng speech to text services using Azure AI speech services"
+	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/speech_to_text.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 
 test_speech_to_text_intent_lenguage: 
-	@echo "Runnng speech to text services adn intent recognition"
+	@echo "Runnig speech to text services and intent recognition Azure AI lengauge understanding"
 	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/intent_from_lenguage.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 test_speech_to_text_intent_openai: 
-	@echo "Runnng speech to text services adn intent recognition"
+	@echo "Running Speech-to-Text services and Intent Recognition using Azure Open AI GPT4"
 	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/intent_from_openai.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 demo_app_speech_to_text_to_speech:
-	@echo "Runnng speech to text services adn intent recognition"
+	@echo "Running app with full end-to-end capability to recognize speech from microphone, process NLU and NLG with Azure Open AI gpt4, and generate speech response with Azure AI speech service"
 	$(PYTHON_INTERPRETER) $(PWD)/src/demo_app.py
 	@echo "Done"

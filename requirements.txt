@@ -8,8 +8,7 @@ seaborn==0.13.0
 ipython
 
 # core azure ai development
-promptflow 
-promptflow-tools
+openai
 azure-cognitiveservices-speech
 azure-ai-ml
 azure-identity

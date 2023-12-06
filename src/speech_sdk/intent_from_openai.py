@@ -87,7 +87,7 @@ def generate_text_with_contextual_history(
         # Ensure the AI's role is always understood
         system_message = {
             "role": "system",
-            "content": "You are an AI assistant that helps people find information.",
+            "content": "You are an AI assistant that helps people find information. Be precise and concise.",
         }
         if not conversation_history or conversation_history[0] != system_message:
             conversation_history.insert(0, system_message)
