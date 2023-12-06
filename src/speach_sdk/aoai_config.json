@@ -1,5 +1,5 @@
 {
-    "COMPLETIONS_MODEL":"foundational-instruct",
-    "OPENAI_API_BASE":"https://ml-workspace-dev-eastus-001-aoai.openai.azure.com/",
-    "OPENAI_API_VERSION":"2023-05-15"
+    "COMPLETIONS_MODEL": "foundational-canadaeast-gpt4",
+    "OPENAI_API_BASE": "https://ml-workspace-dev-canadaeast-001-aoai.openai.azure.com/",
+    "OPENAI_API_VERSION": "2023-05-15"
 }

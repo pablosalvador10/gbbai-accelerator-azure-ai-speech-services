@@ -1,17 +1,22 @@
 import os
+from typing import Optional, Tuple
+
 import azure.cognitiveservices.speech as speechsdk
-from typing import Tuple, Optional
-from utils.ml_logging import get_logger
 from azure.cognitiveservices.speech import SpeechRecognitionResult
+
+from utils.ml_logging import get_logger
 
 # Set up logger
 logger = get_logger()
 
 # Load environment variables
-SPEECH_KEY = os.getenv('SPEECH_KEY')
-SPEECH_REGION = os.getenv('SPEECH_REGION')
+SPEECH_KEY = os.getenv("SPEECH_KEY")
+SPEECH_REGION = os.getenv("SPEECH_REGION")
 
-def recognize_from_microphone(key: str, region: str) -> Tuple[str, Optional[SpeechRecognitionResult]]:
+
+def recognize_from_microphone(
+    key: str, region: str
+) -> Tuple[str, Optional[SpeechRecognitionResult]]:
     """
     Recognizes speech from the microphone.
 
@@ -23,10 +28,12 @@ def recognize_from_microphone(key: str, region: str) -> Tuple[str, Optional[Spee
         Tuple[str, Optional[SpeechRecognitionResult]]: The recognized text and the result object.
     """
     speech_config = speechsdk.SpeechConfig(subscription=key, region=region)
-    speech_config.speech_recognition_language="en-US"
+    speech_config.speech_recognition_language = "en-US"
 
     audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
-    speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+    speech_recognizer = speechsdk.SpeechRecognizer(
+        speech_config=speech_config, audio_config=audio_config
+    )
 
     logger.info("Speak into your microphone.")
     speech_recognition_result = speech_recognizer.recognize_once_async().get()
@@ -34,13 +41,19 @@ def recognize_from_microphone(key: str, region: str) -> Tuple[str, Optional[Spee
     if speech_recognition_result.reason == speechsdk.ResultReason.RecognizedSpeech:
         logger.info("Recognized: {}".format(speech_recognition_result.text))
     elif speech_recognition_result.reason == speechsdk.ResultReason.NoMatch:
-        logger.warning("No speech could be recognized: {}".format(speech_recognition_result.no_match_details))
+        logger.warning(
+            "No speech could be recognized: {}".format(
+                speech_recognition_result.no_match_details
+            )
+        )
     elif speech_recognition_result.reason == speechsdk.ResultReason.Canceled:
         cancellation_details = speech_recognition_result.cancellation_details
-        logger.error("Speech Recognition canceled: {}".format(cancellation_details.reason))
+        logger.error(
+            "Speech Recognition canceled: {}".format(cancellation_details.reason)
+        )
         if cancellation_details.reason == speechsdk.CancellationReason.Error:
             logger.error("Error details: {}".format(cancellation_details.error_details))
             logger.error("Did you set the speech resource key and region values?")
-    
+
     # Return the recognized text and the result object
     return speech_recognition_result.text, speech_recognition_result

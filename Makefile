@@ -77,11 +77,11 @@ create_conda_env:
 	@echo "Creating conda environment"
 	conda env create -f environment.yml
 
-test_speech_to_text_lilly_raw: 
+test_speech_to_text_raw_file: 
 	@echo "Runnng Speach to text services"
 	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 
-test_speech_to_text_lilly_processed: 
+test_speech_to_text_processed_file: 
 	@echo "Runnng Speach to text services"
 	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/speach_to_text.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
@@ -96,13 +96,7 @@ test_speech_to_text_intent_openai:
 	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/intent_from_openai.py --file C:\Users\pablosal\Desktop\lilly-workshop-gbb-text-to-speach\notebooks\dev\8000khz-mulaw-pullstream\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
-## Create Conda environment from a particular location in the repo
-create_conda_env:
-	$(call log_section, Creating Conda environment)
-	conda env create -f $(PWD)/environment.yml
-
-## Create Conda environment from a particular location in the repo
-demo_text_to_speech_speachto_text_openai:
+demo_app_speach_to_text_to_speach:
 	@echo "Runnng Speach to text services adn intent recognition"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speach_sdk/demo_app.py
+	$(PYTHON_INTERPRETER) $(PWD)/src/demo_app.py
 	@echo "Done"
