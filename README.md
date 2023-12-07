@@ -1,4 +1,4 @@
-# Azure AI speech services GBB AI Quick Start Accelerator <img src="./utils/images/azure_logo.png" alt="Azure Logo" style="width:30px;height:30px;"/>
+# Azure AI speech services GBB AI Accelerator <img src="./utils/images/azure_logo.png" alt="Azure Logo" style="width:30px;height:30px;"/>
 
 Welcome to the a GBB AI Quick Start Accelerator! 
 
