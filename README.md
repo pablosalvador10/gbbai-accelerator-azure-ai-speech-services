@@ -32,7 +32,7 @@ Please follow https://github.com/Azure-Samples/cognitive-services-speech-sdk/tre
 
 In this project, `make` is utilized to automate the execution of scripts, significantly streamlining the development process.
 
-### Why Use `make`?
+#### Why Use `make`?
 
 `make` is a powerful build automation tool traditionally used in software development for automating the compilation of executable programs and libraries. It works by reading files called `Makefiles` which define how to build and run tasks.
 
@@ -75,7 +75,7 @@ make demo_app_speech_to_text_to_speech
 ```
 
 
-## 💼 Contributing: Your Gateway to Advanced AI Development & Collaboration!
+## 💼 Contributing
 
 Eager to make significant contributions? Our **[CONTRIBUTING](./CONTRIBUTING.md)** guide is your essential resource! It lays out a clear path for:
 
@@ -84,7 +84,7 @@ Eager to make significant contributions? Our **[CONTRIBUTING](./CONTRIBUTING.md)
 ## 🌲 Project Tree Structure
 
 ```
-📂 ml-project-template
+📂 gbbai-accelerator-azure-ai-speech-services
 ┣ 📂 notebooks <- For development, and quick testing 
 ┣ 📦 src <- Houses main source code for speach_sdk examples.
 ┣ 📂 test <- Runs unit and integration tests for code validation and QA.
