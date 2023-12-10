@@ -1,4 +1,4 @@
-# Azure AI speech services GBB AI Accelerator <img src="./utils/images/azure_logo.png" alt="Azure Logo" style="width:30px;height:30px;"/>
+# Azure AI speech services GBB AI Accelerator (preview) <img src="./utils/images/azure_logo.png" alt="Azure Logo" style="width:30px;height:30px;"/>
 
 Welcome to the a GBB AI Quick Start Accelerator! 
 
@@ -11,8 +11,6 @@ This project leverages advanced AI services from Azure, including Azure AI Speec
 The primary goal of this Accelerator is to provide a quick start for developing complex AI solutions using Azure AI services. It acts as a comprehensive guide for both novices and seasoned professionals, enabling the efficient establishment, deployment, and management of sophisticated AI systems.
 
 ## Prerequisites 
-
-## 🛠 Getting Started
 
 ### 🔧 Dependencies
 
@@ -28,7 +26,7 @@ Add the following keys to your `.env` file (see `.env.sample`)
 
 Please follow https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master/quickstart/python/from-microphone
 
-### Quick start 
+### 🛠 Getting Started
 
 In this project, `make` is utilized to automate the execution of scripts, significantly streamlining the development process.
 
