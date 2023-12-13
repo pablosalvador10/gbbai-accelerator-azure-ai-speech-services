@@ -3,7 +3,7 @@
 Welcome to the a GBB AI Quick Start Accelerator! 
 
 This project leverages advanced AI services from Azure, including Azure AI Speech Services, Azure OpenAI GPT-4, and Azure AI Language Understanding. It includes scripts for:
-- Speech-to-text conversions using Azure's cutting-edge speech recognition.
+- Speech-to-text & text-to-speech conversions using Azure's cutting-edge speech recognition.
 - Intent recognition utilizing Azure Language Understanding to derive meaningful insights from speech.
 - Integration with Azure OpenAI GPT-4 for advanced natural language processing and understanding.
 
