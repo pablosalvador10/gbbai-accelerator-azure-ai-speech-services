@@ -1,11 +1,6 @@
-# core DS development
-numpy==1.26.0
-pandas==2.1.1
-matplotlib==3.8.0
-scikit-learn==1.3.1
-scipy==1.11.3
-seaborn==0.13.0
-ipython
+# app front-end
+streamlit
+pyaudio
 
 # core azure ai development
 openai

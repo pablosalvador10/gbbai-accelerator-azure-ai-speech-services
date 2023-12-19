@@ -1,6 +1,4 @@
-# Azure AI speech services GBB AI Accelerator (preview) <img src="./utils/images/azure_logo.png" alt="Azure Logo" style="width:30px;height:30px;"/>
-
-Welcome to the a GBB AI Quick Start Accelerator! 
+# <img src="./utils/images/azure_logo.png" alt="Azure Logo" style="width:30px;height:30px;"/> Azure AI speech services GBB AI Accelerator (preview) 
 
 This project leverages advanced AI services from Azure, including Azure AI Speech Services, Azure OpenAI GPT-4, and Azure AI Language Understanding. It includes scripts for:
 - Speech-to-text & text-to-speech conversions using Azure's cutting-edge speech recognition.

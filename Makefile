@@ -90,3 +90,8 @@ demo_app_speech_to_text_to_speech:
 	@echo "Running app with full end-to-end capability to recognize speech from microphone, process NLU and NLG with Azure Open AI gpt4, and generate speech response with Azure AI speech service"
 	$(PYTHON_INTERPRETER) $(PWD)/src/demo_app.py
 	@echo "Done"
+
+run_app:
+	@echo "Running streamlit app with full end-to-end capability to recognize speech from microphone"
+	streamlit run $(PWD)/src/app/app_test.py
+	@echo "Done"

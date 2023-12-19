@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from typing import Optional, Tuple
 
 import azure.cognitiveservices.speech as speechsdk
@@ -8,6 +9,9 @@ from utils.ml_logging import get_logger
 
 # Set up logger
 logger = get_logger()
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Load environment variables
 SPEECH_KEY = os.getenv("SPEECH_KEY")
