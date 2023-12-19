@@ -55,8 +55,7 @@ def start_listening(key, region):
     st.sidebar.markdown("#### Live Conversation:")
     with st.sidebar:
         st.write(f"🤖 AI System: {response}")
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.submit(synthesize_speech, response, SPEECH_KEY, SPEECH_REGION)
+    synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
     asyncio.run(send_receive(key, region))
 
 

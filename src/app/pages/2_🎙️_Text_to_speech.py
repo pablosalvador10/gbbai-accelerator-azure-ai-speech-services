@@ -3,8 +3,10 @@ import base64
 import os
 from datetime import datetime
 import uuid
+from typing import Optional
 
 from src.speech_sdk.text_to_speech import synthesize_speech
+from src.speech_sdk.speech_to_text import transcribe_speech_from_file_continuous
 from utils.ml_logging import get_logger
 
 # Set up logger and environment variables
@@ -12,24 +14,67 @@ logger = get_logger()
 SPEECH_KEY = os.getenv("SPEECH_KEY")
 SPEECH_REGION = os.getenv("SPEECH_REGION")
 
-from src.speech_sdk.speech_to_text import transcribe_speech_from_file_continuous
-
-# Initialize session state variables if they don't exist
+# Initialize session state variables
 if 'transcribed_texts' not in st.session_state:
     st.session_state['transcribed_texts'] = {}
+if 'display_files' not in st.session_state:
+    st.session_state['display_files'] = {}
+if 'clear_flag' not in st.session_state:
+    st.session_state['clear_flag'] = {}
 
-# Function to convert image to base64
-def get_image_base64(image_path):
+def get_image_base64(image_path: str) -> str:
+    """
+    Convert an image to a base64 encoded string.
+
+    :param image_path: Path to the image file.
+    :return: Base64 encoded string of the image.
+    """
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode("utf-8")
 
-# Web user interface
+def clear_filename_history(file_name: str):
+    """
+    Clear the transcription and display state for a specific file.
+
+    :param file_name: Name of the file to clear from session state.
+    """
+    st.session_state['transcribed_texts'].pop(file_name, None)
+    st.session_state['display_files'].pop(file_name, None)
+    st.session_state['clear_flag'][file_name] = True
+
+def save_uploaded_file(uploaded_file) -> str:
+    """
+    Save an uploaded file to a specified directory.
+
+    :param uploaded_file: Streamlit UploadedFile object.
+    :return: Path to the saved file.
+    """
+    upload_directory = os.path.join("src", "app", "uploads")
+    if not os.path.exists(upload_directory):
+        os.makedirs(upload_directory)
+
+    st.session_state["conversation_id"] = str(uuid.uuid4())
+    st.session_state["conversation_start_time"] = datetime.now()
+    date_str = st.session_state["conversation_start_time"].strftime("%Y%m%d")
+
+    subdirectory = os.path.join(upload_directory, f"{st.session_state['conversation_id']}_{date_str}")
+    if not os.path.exists(subdirectory):
+        os.makedirs(subdirectory)
+
+    file_path = os.path.join(subdirectory, uploaded_file.name)
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+
+    return file_path
+
+# UI setup
 st.markdown(
     f"""
     <h1 style="text-align:center;">
-        🎙️ Speach to Text hub ! 
+        🎙️ Speech to Text hub!
         <br>
-        <span style="font-style:italic; font-size:0.7em;">with Azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
+        <span style="font-style:italic; font-size:0.7em;">with Azure AI services</span>
+        <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
     </h1>
     """,
     unsafe_allow_html=True,
@@ -61,15 +106,21 @@ with st.expander("About this App"):
 
 # Function to download a specific file's transcription
 def download_transcription(file_name):
-    if file_name in st.session_state['transcribed_texts']:
-        return st.session_state['transcribed_texts'][file_name]
-    return ""
+    return st.session_state['transcribed_texts'].get(file_name, "")
 
 def clear_conversation_history():
     """
     Clear the conversation history stored in the session state.
     """
     st.session_state["conversation_history"] = []
+
+
+def clear_filename_history(file_name):
+    st.session_state['transcribed_texts'].pop(file_name, None)
+    st.session_state['display_files'].pop(file_name, None)
+    st.session_state['clear_flag'][file_name] = True  # Set flag to indicate clearing
+
+
 
 def save_uploaded_file(uploaded_file):
     # Create a directory for storing uploaded files if it doesn't exist
@@ -100,51 +151,42 @@ def save_uploaded_file(uploaded_file):
 uploaded_files = st.file_uploader("Choose an audio file", accept_multiple_files=True, type=['wav', 'mp3', 'pcm'])
 
 for uploaded_file in uploaded_files:
-    # Check if transcription is already cached
-    if uploaded_file.name in st.session_state['transcribed_texts']:
-        transcribed_text = st.session_state['transcribed_texts'][uploaded_file.name]
-        text_area_placeholder = st.empty()
-        text_area_placeholder.text_area(f"Transcribed Text for {uploaded_file.name}:", transcribed_text, height=300, disabled=True, key=f"transcribed_text_{uploaded_file.name}")
-    else:
-        # Display a placeholder text area indicating that transcription is in progress
-        text_area_placeholder = st.empty()
-        text_area_placeholder.text_area(f"Transcribing Text for {uploaded_file.name}:", "AI system working...", height=300, disabled=True)
+    file_name = uploaded_file.name
+    st.session_state['display_files'][file_name] = True
 
-        # Process and save the uploaded file
+    if file_name not in st.session_state['transcribed_texts']:
         file_path = save_uploaded_file(uploaded_file)
-
-        # Transcribe the speech
         transcribed_text = transcribe_speech_from_file_continuous(file_path, SPEECH_KEY, SPEECH_REGION)
-        st.session_state['transcribed_texts'][uploaded_file.name] = transcribed_text
+        st.session_state['transcribed_texts'][file_name] = transcribed_text
 
-        # Update the display with the transcribed text
-        text_area_placeholder.text_area(f"Transcribed Text for {uploaded_file.name}:", transcribed_text, height=300, disabled=True, key=f"transcribed_text_{uploaded_file.name}")
+    if st.session_state['display_files'].get(file_name):
+        if st.session_state['clear_flag'].get(file_name):
+            st.session_state['clear_flag'][file_name] = False
+        else:
+            text_display = st.session_state['transcribed_texts'].get(file_name, "")
+            st.text_area(f"Transcribed Text for {file_name}:", text_display, height=300, disabled=True, key=f"transcribed_text_{file_name}")
 
-    # Button for synthesizing speech
-    if st.button('🔊 Synthesize Speech', key=f"synthesize_{uploaded_file.name}"):
-        synthesize_speech(transcribed_text, SPEECH_KEY, SPEECH_REGION)
+        col1, col2 = st.columns(2)
+        if col1.button('🔊 Synthesize Speech', key=f"synthesize_{file_name}"):
+            synthesize_speech(text_display, SPEECH_KEY, SPEECH_REGION)
+        if col2.button('🗑️ Clear & Remove', key=f"clear_{file_name}"):
+            clear_filename_history(file_name)
 
-    st.markdown("---")  # Adds a separator line
+        st.markdown("---")
 
-# Function to remove a specific transcription from the history
-def remove_transcription(file_name):
-    if file_name in st.session_state['transcribed_texts']:
-        del st.session_state['transcribed_texts'][file_name]
-    
 # Display download buttons for each transcribed file
 for file_name, transcription in st.session_state['transcribed_texts'].items():
     # Add file name, transcription length, and transcription to the file text
-    file_text = f"File Name: {file_name}\n"
-    file_text += f"Transcription Length: {len(transcription)} tokens\n"
-    file_text += f"Transcription:\n\n{transcription}\n"
+    if st.session_state['display_files'].get(file_name, False):
+        file_text = f"File Name: {file_name}\n"
+        file_text += f"Transcription Length: {len(transcription)} tokens\n"
+        file_text += f"Transcription:\n\n{transcription}\n"
 
-    st.download_button(
-        label=f"Download Transcription for {file_name}",
-        data=file_text,
-        file_name=f"transcription_{file_name}.txt",
-        mime="text/plain",
-        key=f"download_{file_name}"
-    )
-
-
-
+        # Only display the download button if the file exists in the session state
+        st.download_button(
+            label=f"Download Transcription for {file_name}",
+            data=file_text,
+            file_name=f"transcription_{file_name}.txt",
+            mime="text/plain",
+            key=f"download_{file_name}"
+        )

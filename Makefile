@@ -95,3 +95,8 @@ run_app:
 	@echo "Running streamlit app with full end-to-end capability to recognize speech from microphone"
 	streamlit run $(PWD)/src/app/Home.py
 	@echo "Done"
+
+delete_old_folders: 
+	@echo "Deleting old folders"
+	$(PYTHON_INTERPRETER) $(PWD)/utils/batch_delete.py --base_path $(PWD)\src\app\uploads --days_threshold 0
+	@echo "Done"
