@@ -93,9 +93,9 @@ def download_conversation_history():
 st.markdown(
     f"""
     <h1 style="text-align:center;">
-        🎙️ Real-Time Conversational Agent
+        🤖 Real-Time Conversational Agent
         <br>
-        <span style="font-style:italic; font-size:0.7em;">with azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
+        <span style="font-style:italic; font-size:0.7em;">with Azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
     </h1>
     """,
     unsafe_allow_html=True,
@@ -152,13 +152,14 @@ async def send_receive(key, region):
 
                 if any(stop_word in prompt.lower() for stop_word in STOP_WORDS):
                     st.session_state["run"] = False
-                    response = "Goodbye."
+                    response = "Goodbye. I hope I was able to help you today."
                     synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
                     st.session_state["conversation_history"].append(
                         f"AI System: {response}"
                     )
                     with st.sidebar:
                         st.write(f"🤖 AI System: {response}")
+                    stop_listening()
                     break
 
                 response = generate_text_with_contextual_history(
@@ -180,10 +181,10 @@ async def send_receive(key, region):
                 response = (
                     f"No speech detected for over {SILENCE_THRESHOLD} seconds. Goodbye."
                 )
-                synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
                 st.session_state["conversation_history"].append(
                     f"AI System: {response}"
                 )
+                stop_listening()
                 break
 
         except Exception as e:
@@ -203,4 +204,4 @@ if not st.session_state["run"] and st.session_state["conversation_history"]:
             for line in st.session_state["conversation_history"]
         ]
     )
-    st.text_area("History", value=chat_format, height=200, disabled=True)
+    st.text_area("Chat", placeholder="Chat history will appear here once the conversation ends...", value=chat_format, height=300, disabled=True)

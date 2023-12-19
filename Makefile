@@ -93,5 +93,5 @@ demo_app_speech_to_text_to_speech:
 
 run_app:
 	@echo "Running streamlit app with full end-to-end capability to recognize speech from microphone"
-	streamlit run $(PWD)/src/app/app_test.py
+	streamlit run $(PWD)/src/app/Home.py
 	@echo "Done"

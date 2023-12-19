@@ -163,3 +163,6 @@ notebooks/dev/test/*
 
 outputs
 multirun
+
+#ignore test runs
+src/app/uploads/*
