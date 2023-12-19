@@ -32,6 +32,19 @@ def get_image_base64(image_path: str) -> str:
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode("utf-8")
 
+def transcribe_with_progress(file_path: str, file_name: str, key: str, region: str) -> str:
+    """
+    Transcribe speech from a file with a progress indicator.
+
+    :param file_path: Path to the audio file.
+    :param key: API key for the speech service.
+    :param region: Region for the speech service.
+    :return: Transcribed text.
+    """
+    with st.spinner(f'🤖 Transcribing {file_name}... Please wait.'):
+        transcribed_text = transcribe_speech_from_file_continuous(file_path, key, region)
+    return transcribed_text
+
 def clear_filename_history(file_name: str):
     """
     Clear the transcription and display state for a specific file.
@@ -161,7 +174,7 @@ for uploaded_file in uploaded_files:
 
     if file_name not in st.session_state['transcribed_texts']:
         file_path = save_uploaded_file(uploaded_file)
-        transcribed_text = transcribe_speech_from_file_continuous(file_path, SPEECH_KEY, SPEECH_REGION)
+        transcribed_text = transcribe_with_progress(file_path, file_name, SPEECH_KEY, SPEECH_REGION)
         st.session_state['transcribed_texts'][file_name] = transcribed_text
 
     if st.session_state['display_files'].get(file_name):
