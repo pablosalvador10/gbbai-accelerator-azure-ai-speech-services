@@ -1,9 +1,9 @@
 import os
-from dotenv import load_dotenv
 from typing import Optional, Tuple
 
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechRecognitionResult
+from dotenv import load_dotenv
 
 from utils.ml_logging import get_logger
 
