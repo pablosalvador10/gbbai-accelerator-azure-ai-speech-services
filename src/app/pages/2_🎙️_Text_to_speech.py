@@ -114,13 +114,18 @@ def clear_conversation_history():
     """
     st.session_state["conversation_history"] = []
 
+def reset_application():
+    """
+    Reset the application state, clearing all cached data and files.
+    """
+    st.session_state['transcribed_texts'] = {}
+    st.session_state['display_files'] = {}
+    st.session_state['clear_flag'] = {}
 
 def clear_filename_history(file_name):
     st.session_state['transcribed_texts'].pop(file_name, None)
     st.session_state['display_files'].pop(file_name, None)
     st.session_state['clear_flag'][file_name] = True  # Set flag to indicate clearing
-
-
 
 def save_uploaded_file(uploaded_file):
     # Create a directory for storing uploaded files if it doesn't exist
@@ -173,6 +178,10 @@ for uploaded_file in uploaded_files:
             clear_filename_history(file_name)
 
         st.markdown("---")
+
+# Reset button
+if st.button('🔄 Reset Application'):
+    reset_application()
 
 # Display download buttons for each transcribed file
 for file_name, transcription in st.session_state['transcribed_texts'].items():
