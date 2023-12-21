@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import Optional, List
+from typing import List, Optional
 
 import openai
 from dotenv import load_dotenv
@@ -167,17 +167,21 @@ class AzureOpenAIAssistant:
 
             logger.info(f"LLM Model Prompt: {prompt}")
 
-            response_text = self.generate_text_completion(prompt=prompt,
-                                                     temperature=temperature,
-                                                     max_tokens=max_tokens,
-                                                     deployment_completion_name=self.deployment_completion_name)
+            response_text = self.generate_text_completion(
+                prompt=prompt,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                deployment_completion_name=self.deployment_completion_name,
+            )
 
             logger.info(f"LLM Model Response: {response_text}")
 
             return response_text
 
         except Exception as e:
-            logger.error(f"Failed to generate text completion with {self.deployment_completion_name}: {e}")
+            logger.error(
+                f"Failed to generate text completion with {self.deployment_completion_name}: {e}"
+            )
             return None
 
 

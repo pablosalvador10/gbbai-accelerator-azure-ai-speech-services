@@ -1,5 +1,6 @@
-import streamlit as st
 import base64
+
+import streamlit as st
 
 
 # Function to convert image to base64

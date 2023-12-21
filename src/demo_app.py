@@ -19,6 +19,7 @@ SPEECH_REGION = os.getenv("SPEECH_REGION")
 STOP_WORDS = ["goodbye", "exit", "stop", "see you later", "bye"]
 SILENCE_THRESHOLD = 20  # in seconds
 
+
 def check_for_stopwords(prompt: str) -> bool:
     """
     Check if the given prompt contains any predefined stop words.
@@ -31,6 +32,7 @@ def check_for_stopwords(prompt: str) -> bool:
     """
     return any(stop_word in prompt.lower() for stop_word in STOP_WORDS)
 
+
 def handle_speech_recognition() -> str:
     """
     Handles speech recognition from the microphone.
@@ -41,6 +43,7 @@ def handle_speech_recognition() -> str:
     logger.info("Recognizing speech from microphone...")
     prompt, _ = recognize_from_microphone(SPEECH_KEY, SPEECH_REGION)
     return prompt
+
 
 def main():
     """
@@ -64,7 +67,9 @@ def main():
                     break
 
                 response = az_openai_client.generate_text_with_contextual_history(
-                    conversation_history, prompt, deployment_name="foundational-canadaeast-gpt4"
+                    conversation_history,
+                    prompt,
+                    deployment_name="foundational-canadaeast-gpt4",
                 )
 
                 if response:
@@ -73,13 +78,20 @@ def main():
                 else:
                     logger.warning("No response generated.")
             elif time.time() - last_speech_time > SILENCE_THRESHOLD:
-                logger.info(f"No speech detected for over {SILENCE_THRESHOLD} seconds, exiting...")
-                synthesize_speech(f"No speech detected for over {SILENCE_THRESHOLD} seconds. Goodbye.", SPEECH_KEY, SPEECH_REGION)
+                logger.info(
+                    f"No speech detected for over {SILENCE_THRESHOLD} seconds, exiting..."
+                )
+                synthesize_speech(
+                    f"No speech detected for over {SILENCE_THRESHOLD} seconds. Goodbye.",
+                    SPEECH_KEY,
+                    SPEECH_REGION,
+                )
                 break
             else:
                 logger.warning("No prompt recognized.")
     except Exception as e:
         logger.error(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     main()

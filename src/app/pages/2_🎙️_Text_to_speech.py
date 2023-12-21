@@ -1,12 +1,13 @@
-import streamlit as st
 import base64
 import os
-from datetime import datetime
 import uuid
+from datetime import datetime
 
-from src.speech.text_to_speech import synthesize_speech
+import streamlit as st
+
 from src.aoai_sdk.intent_azure_openai import summarize_and_classify_intent
 from src.speech.speech_to_text import transcribe_speech_from_file_continuous
+from src.speech.text_to_speech import synthesize_speech
 from utils.ml_logging import get_logger
 
 # Set up logger and environment variables
