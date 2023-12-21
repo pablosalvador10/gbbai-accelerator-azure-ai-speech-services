@@ -5,7 +5,7 @@ import time
 import azure.cognitiveservices.speech as speechsdk
 from dotenv import load_dotenv
 
-from src.speech_sdk.utils_audio import log_audio_characteristics
+from src.speech.utils_audio import log_audio_characteristics
 from utils.ml_logging import get_logger
 
 load_dotenv()

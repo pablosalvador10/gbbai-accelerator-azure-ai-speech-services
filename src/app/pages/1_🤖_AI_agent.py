@@ -7,11 +7,11 @@ from datetime import datetime
 
 import streamlit as st
 
-from src.speech_sdk.intent_azure_openai import generate_text_with_contextual_history
+from src.aoai_sdk.intent_azure_openai import generate_text_with_contextual_history
 
 # Import your Azure AI Speech to Text function
-from src.speech_sdk.speech_recognizer import recognize_from_microphone
-from src.speech_sdk.text_to_speech import synthesize_speech
+from src.speech.speech_recognizer import recognize_from_microphone
+from src.speech.text_to_speech import synthesize_speech
 from utils.ml_logging import get_logger
 
 # Set up logger and environment variables
@@ -34,7 +34,8 @@ if "conversation_history" not in st.session_state:
 def get_image_base64(image_path):
     with open(image_path, "rb") as img_file:
         return base64.b64encode(img_file.read()).decode("utf-8")
-    
+
+
 def clear_conversation_history():
     """
     Clear the conversation history stored in the session state.
@@ -202,4 +203,10 @@ if not st.session_state["run"] and st.session_state["conversation_history"]:
             for line in st.session_state["conversation_history"]
         ]
     )
-    st.text_area("Chat", placeholder="Chat history will appear here once the conversation ends...", value=chat_format, height=300, disabled=True)
+    st.text_area(
+        "Chat",
+        placeholder="Chat history will appear here once the conversation ends...",
+        value=chat_format,
+        height=300,
+        disabled=True,
+    )

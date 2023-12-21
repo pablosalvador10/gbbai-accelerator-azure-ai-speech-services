@@ -81,9 +81,9 @@ test_speech_to_text_intent_lenguage:
 	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/intent_from_lenguage.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
-test_speech_to_text_intent_openai: 
-	@echo "Running Speech-to-Text services and Intent Recognition using Azure Open AI GPT4"
-	$(PYTHON_INTERPRETER) $(PWD)/src/speech_sdk/intent_from_openai.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
+test_speech_to_text_intent_azure_openai: 
+	@echo "Running Speech-to-Text services and Intent Recognition using Azure Open AI GPT-3.5 models"
+	$(PYTHON_INTERPRETER) $(PWD)/src/aoai/intent_azure_openai.py --file $(PWD)\utils\audio_data\d6a35a5e-be01-40cd-b9ef-d61fcda699fa.wav
 	@echo "Done"
 
 demo_app_speech_to_text_to_speech:
