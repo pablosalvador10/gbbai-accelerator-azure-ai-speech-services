@@ -17,7 +17,7 @@ st.write(
     <h1 style="text-align:center;">
         Welcome to AI Speech Hub! 👋
         <br>
-        <span style="font-style:italic; font-size:0.7em;">with azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
+        <span style="font-style:italic; font-size:0.7em;">powered by Azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
     </h1>
     """,
     unsafe_allow_html=True,

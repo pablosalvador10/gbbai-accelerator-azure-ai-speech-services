@@ -1,7 +1,7 @@
 import os
 import time
 
-from src.speech_sdk.intent_from_openai import generate_text_with_contextual_history
+from src.speech_sdk.intent_azure_openai import generate_text_with_contextual_history
 from src.speech_sdk.speech_recognizer import recognize_from_microphone
 from src.speech_sdk.text_to_speech import synthesize_speech
 from utils.ml_logging import get_logger

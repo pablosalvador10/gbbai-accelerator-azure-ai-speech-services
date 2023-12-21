@@ -7,7 +7,7 @@ from datetime import datetime
 
 import streamlit as st
 
-from src.speech_sdk.intent_from_openai import generate_text_with_contextual_history
+from src.speech_sdk.intent_azure_openai import generate_text_with_contextual_history
 
 # Import your Azure AI Speech to Text function
 from src.speech_sdk.speech_recognizer import recognize_from_microphone
@@ -93,7 +93,7 @@ st.markdown(
     <h1 style="text-align:center;">
         🤖 Real-Time Conversational Agent
         <br>
-        <span style="font-style:italic; font-size:0.7em;">with Azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
+        <span style="font-style:italic; font-size:0.5em;">powered by Azure AI services</span> <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
     </h1>
     """,
     unsafe_allow_html=True,

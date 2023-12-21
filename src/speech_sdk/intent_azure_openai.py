@@ -125,6 +125,48 @@ def generate_text_with_contextual_history(
         logger.error(f"OpenAI API returned an error: {e}")
 
 
+def summarize_and_classify_intent(text, 
+                                    temperature=0.7,
+                                    max_tokens=150,
+                                    deployment_name="foundational-35-turbo"):
+    """
+    Uses GPT-4 to provide a concise, professional summary and intent classification of the provided text.
+    """
+    try:
+        # Constructing a more detailed prompt for GPT-4
+        prompt = (f"Task: Read the following text and perform two actions. First, provide a concise, professional summary. "
+                  f"Second, analyze and clearly state the primary intent of the text.\n\n"
+                  f"---\n\n"
+                  f"Text:\n{text}\n\n"
+                  f"---\n\n"
+                  f"Summary and Intent Classification:")
+
+        logger.info(f"GPT-4 Model Prompt: {prompt}")
+
+        # Generating the summary and intent classification using GPT-4
+        response = openai.Completion.create(
+            engine=deployment_name,  # Use other GPT-4 models if preferred
+            prompt=prompt,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        # Extracting the response text
+        response_text = response.choices[0].text.strip()
+
+        # Log the response
+        logger.info(f"GPT-4 Model Response: {response_text}")
+
+        return response_text
+    except Exception as e:
+        logger.error(f"Failed to generate text completion with GPT-4: {e}")
+        return None
+
+
+
 def transcribe_and_analyze_speech():
     """
     Transcribes speech from an audio file and analyzes it using OpenAI.

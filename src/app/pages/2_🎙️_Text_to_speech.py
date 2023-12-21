@@ -3,9 +3,9 @@ import base64
 import os
 from datetime import datetime
 import uuid
-from typing import Optional
 
 from src.speech_sdk.text_to_speech import synthesize_speech
+from src.speech_sdk.intent_azure_openai import summarize_and_classify_intent
 from src.speech_sdk.speech_to_text import transcribe_speech_from_file_continuous
 from utils.ml_logging import get_logger
 
@@ -43,6 +43,22 @@ def transcribe_with_progress(file_path: str, file_name: str, key: str, region: s
     """
     with st.spinner(f'🤖 Transcribing {file_name}... Please wait.'):
         transcribed_text = transcribe_speech_from_file_continuous(file_path, key, region)
+    return transcribed_text
+
+
+def summarize(text: str) -> str:
+    """
+    Transcribe speech from a file with a progress indicator.
+
+    :param file_path: Path to the audio file.
+    :param key: API key for the speech service.
+    :param region: Region for the speech service.
+    :return: Transcribed text.
+    """
+
+    
+    with st.spinner(f'🤖 Transcribing {file_name}... Please wait.'):
+        transcribed_text = summarize_and_classify_intent(text=text,deployment_name="foundational-canadaeast-gpt4")
     return transcribed_text
 
 def clear_filename_history(file_name: str):
@@ -86,7 +102,7 @@ st.markdown(
     <h1 style="text-align:center;">
         🎙️ Speech to Text hub!
         <br>
-        <span style="font-style:italic; font-size:0.7em;">with Azure AI services</span>
+        <span style="font-style:italic; font-size:0.5em;">powered by Azure AI services</span>
         <img src="data:image/png;base64,{get_image_base64('./utils/images/azure_logo.png')}" alt="logo" style="width:30px;height:30px;">
     </h1>
     """,
@@ -184,11 +200,15 @@ for uploaded_file in uploaded_files:
             text_display = st.session_state['transcribed_texts'].get(file_name, "")
             st.text_area(f"Transcribed Text for {file_name}:", text_display, height=300, disabled=True, key=f"transcribed_text_{file_name}")
 
-        col1, col2 = st.columns(2)
-        if col1.button('🔊 Synthesize Speech', key=f"synthesize_{file_name}"):
+        col1, col2, col3 = st.columns(3)
+        if col1.button('🔊 Generate Speech', key=f"synthesize_{file_name}"):
             synthesize_speech(text_display, SPEECH_KEY, SPEECH_REGION)
-        if col2.button('🗑️ Clear & Remove', key=f"clear_{file_name}"):
+        if col2.button('📝 Summarize Text', key=f"summarize_{file_name}"):
+            text = summarize(st.session_state['transcribed_texts'][file_name])
+            st.text_area(f"Summarized Text for {file_name}:", text, height=100, disabled=True, key=f"summarized_text_{file_name}")
+        if col3.button('🗑️ Clear & Delete Data', key=f"clear_{file_name}"):
             clear_filename_history(file_name)
+        
 
         st.markdown("---")
 
