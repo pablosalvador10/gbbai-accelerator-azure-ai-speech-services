@@ -2,8 +2,8 @@ import os
 from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
+from azure.cognitiveservices.speech.audio import AudioOutputConfig
 from azure.cognitiveservices.speech import (
-    AudioOutputConfig,
     SpeechConfig,
     SpeechSynthesisResult,
 )

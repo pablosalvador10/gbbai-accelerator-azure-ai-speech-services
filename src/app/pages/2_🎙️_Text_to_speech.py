@@ -5,7 +5,7 @@ from datetime import datetime
 
 import streamlit as st
 
-from src.aoai_sdk.intent_azure_openai import summarize_and_classify_intent
+from src.aoai.intent_azure_openai import AzureOpenAIAssistant
 from src.speech.speech_to_text import transcribe_speech_from_file_continuous
 from src.speech.text_to_speech import synthesize_speech
 from utils.ml_logging import get_logger
@@ -22,7 +22,8 @@ if "display_files" not in st.session_state:
     st.session_state["display_files"] = {}
 if "clear_flag" not in st.session_state:
     st.session_state["clear_flag"] = {}
-
+if "az_aoai" not in st.session_state:
+    st.session_state["az_aoai"] = AzureOpenAIAssistant()
 
 def get_image_base64(image_path: str) -> str:
     """
@@ -55,19 +56,14 @@ def transcribe_with_progress(
 
 def summarize(text: str) -> str:
     """
-    Transcribe speech from a file with a progress indicator.
+    Summarize the provided text and extract its intent.
 
-    :param file_path: Path to the audio file.
-    :param key: API key for the speech service.
-    :param region: Region for the speech service.
-    :return: Transcribed text.
+    :param text: The text to be summarized.
+    :return: Summarized text and its intent.
     """
-
-    with st.spinner(f"🤖 Transcribing {file_name}... Please wait."):
-        transcribed_text = summarize_and_classify_intent(
-            text=text, deployment_name="foundational-canadaeast-gpt4"
-        )
-    return transcribed_text
+    with st.spinner(f"🤖 Summarizing and extracting intent from the text... Please wait."):
+        response = st.session_state["az_aoai"].summarize_and_classify_intent(text=text)
+    return response
 
 
 def clear_filename_history(file_name: str):

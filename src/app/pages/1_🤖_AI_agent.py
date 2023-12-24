@@ -6,7 +6,7 @@ from datetime import datetime
 
 import streamlit as st
 
-from src.aoai_sdk.intent_azure_openai import generate_text_with_contextual_history
+from src.aoai.intent_azure_openai import AzureOpenAIAssistant
 
 # Import your Azure AI Speech to Text function
 from src.speech.speech_recognizer import recognize_from_microphone
@@ -27,6 +27,8 @@ if "conversation_history" not in st.session_state:
     st.session_state["conversation_history"] = []
     st.session_state["real_time_conversation"] = ""
     st.session_state["run"] = False
+if "az_aoai" not in st.session_state:
+    st.session_state["az_aoai"] = AzureOpenAIAssistant()
 
 
 # Function to convert image to base64
@@ -160,7 +162,7 @@ async def send_receive(key, region):
                     stop_listening()
                     break
 
-                response = generate_text_with_contextual_history(
+                response = st.session_state["az_aoai"].generate_text_with_contextual_history(
                     [],
                     prompt,
                     deployment_name="foundational-canadaeast-gpt4",

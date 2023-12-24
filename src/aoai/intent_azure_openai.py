@@ -1,6 +1,6 @@
 import argparse
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import openai
 from dotenv import load_dotenv
@@ -93,6 +93,7 @@ class AzureOpenAIAssistant:
         system_message_content: str = "You are an AI assistant that helps people find information. Please be very precise, polite, and concise.",
         temperature: float = 0.7,
         max_tokens: int = 150,
+        seed: int = 42,
     ) -> Optional[str]:
         """
         Generates a text response using Foundation models from OpenAI, considering the conversation history as context and focusing on the latest prompt.
@@ -125,6 +126,7 @@ class AzureOpenAIAssistant:
                 messages=messages_for_api,
                 temperature=temperature,
                 max_tokens=max_tokens,
+                seed = 42,
             )
 
             response_content = response["choices"][0]["message"]["content"]
@@ -143,45 +145,45 @@ class AzureOpenAIAssistant:
         text: str,
         temperature: float = 0.7,
         max_tokens: int = 300,
+        seed: int = 42,
     ) -> Optional[str]:
         """
-        Uses GPT-XX to provide a concise, professional summary and intent classification of the provided text.
+        Uses GPT-4 to provide a concise, professional summary and intent classification of the provided text.
 
         Args:
             text (str): The text to be summarized and classified.
+            conversation_history (List[Dict[str, str]]): The conversation history.
+            system_message_content (str): The system message content.
             temperature (float, optional): Controls randomness in the output. Defaults to 0.7.
             max_tokens (int, optional): Maximum number of tokens to generate. Defaults to 300.
+            seed (int, optional): A random seed for deterministic output. Defaults to None.
 
         Returns:
             Optional[str]: The summary and intent classification or None if an error occurs.
         """
         try:
-            prompt = (
-                f"Task: Read the following text and perform two actions. First, provide a concise, professional summary. "
-                f"Second, analyze and clearly state the primary intent of the text.\n\n"
-                f"---\n\n"
-                f"Text:\n{text}\n\n"
-                f"---\n\n"
-                f"Summary and Intent Classification:"
+
+            system_message_content = (
+                    f"As an AI assistant, you will perform two actions on the following text. "
+                    f"First, you should provide a concise, professional summary. "
+                    f"Second, you should analyze and clearly state the primary intent of the text. in this format: \n\n"
+                    f"---\n\n"
+                    f"Summary and Intent Classification:")
+  
+
+            response = self.generate_text_with_contextual_history(conversation_history=[],
+                                                                  latest_prompt=text,
+                                                                  system_message_content=system_message_content,
+                                                                  max_tokens=300)
+
+            logger.info(
+             f"Summarization and intent classification successful. Response: {response}"
             )
 
-            logger.info(f"LLM Model Prompt: {prompt}")
-
-            response_text = self.generate_text_completion(
-                prompt=prompt,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                deployment_completion_name=self.deployment_completion_name,
-            )
-
-            logger.info(f"LLM Model Response: {response_text}")
-
-            return response_text
+            return response
 
         except Exception as e:
-            logger.error(
-                f"Failed to generate text completion with {self.deployment_completion_name}: {e}"
-            )
+            logger.error(f"Failed to generate text completion with GPT-4: {e}")
             return None
 
 
@@ -208,17 +210,11 @@ def transcribe_summarize_and_gather_intent_from_audio_file() -> Optional[str]:
         logger.error("Failed to transcribe speech from the provided audio file.")
         return None
 
-    response = assistant.summarize_and_classify_intent(transcription)
-    if response:
-        logger.info(
-            f"Summarization and intent classification successful. Response: {response}"
-        )
-        return response
-    else:
-        logger.error(
-            "Failed to summarize and classify intent from the transcribed text."
-        )
-        return None
+    response = assistant.summarize_and_classify_intent(text=transcription)
+    if not response:
+        error_message = "Failed to summarize and classify intent from the transcribed text. The response from the OpenAI API was None."
+        logger.error(error_message)
+        raise ValueError(error_message)
 
 
 if __name__ == "__main__":
