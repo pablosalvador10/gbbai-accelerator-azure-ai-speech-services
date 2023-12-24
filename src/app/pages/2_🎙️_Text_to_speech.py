@@ -6,6 +6,7 @@ from datetime import datetime
 import streamlit as st
 
 from src.aoai.intent_azure_openai import AzureOpenAIAssistant
+from utils.azure_blob import AzureBlobManager
 from src.speech.speech_to_text import transcribe_speech_from_file_continuous
 from src.speech.text_to_speech import synthesize_speech
 from utils.ml_logging import get_logger
@@ -15,6 +16,7 @@ logger = get_logger()
 SPEECH_KEY = os.getenv("SPEECH_KEY")
 SPEECH_REGION = os.getenv("SPEECH_REGION")
 
+
 # Initialize session state variables
 if "transcribed_texts" not in st.session_state:
     st.session_state["transcribed_texts"] = {}
@@ -22,8 +24,11 @@ if "display_files" not in st.session_state:
     st.session_state["display_files"] = {}
 if "clear_flag" not in st.session_state:
     st.session_state["clear_flag"] = {}
-if "az_aoai" not in st.session_state:
-    st.session_state["az_aoai"] = AzureOpenAIAssistant()
+if "az_aoai_manager" not in st.session_state:
+    st.session_state["az_aoai_manager"] = AzureOpenAIAssistant()
+if "az_blob_manager" not in st.session_state:
+    st.session_state["az_blob_manager"] = AzureBlobManager(container_name="speechapp")
+    
 
 def get_image_base64(image_path: str) -> str:
     """
@@ -62,7 +67,7 @@ def summarize(text: str) -> str:
     :return: Summarized text and its intent.
     """
     with st.spinner(f"🤖 Summarizing and extracting intent from the text... Please wait."):
-        response = st.session_state["az_aoai"].summarize_and_classify_intent(text=text)
+        response = st.session_state["az_aoai_manager"].summarize_and_classify_intent(text=text)
     return response
 
 
@@ -77,6 +82,33 @@ def clear_filename_history(file_name: str):
     st.session_state["clear_flag"][file_name] = True
 
 
+# def save_uploaded_file(uploaded_file) -> str:
+#     """
+#     Save an uploaded file to a specified directory.
+
+#     :param uploaded_file: Streamlit UploadedFile object.
+#     :return: Path to the saved file.
+#     """
+#     upload_directory = os.path.join("src", "app", "uploads")
+#     if not os.path.exists(upload_directory):
+#         os.makedirs(upload_directory)
+
+#     st.session_state["conversation_id"] = str(uuid.uuid4())
+#     st.session_state["conversation_start_time"] = datetime.now()
+#     date_str = st.session_state["conversation_start_time"].strftime("%Y%m%d")
+
+#     subdirectory = os.path.join(
+#         upload_directory, f"{st.session_state['conversation_id']}_{date_str}"
+#     )
+#     if not os.path.exists(subdirectory):
+#         os.makedirs(subdirectory)
+
+#     file_path = os.path.join(subdirectory, uploaded_file.name)
+#     with open(file_path, "wb") as f:
+#         f.write(uploaded_file.getbuffer())
+
+#     return file_path
+    
 def save_uploaded_file(uploaded_file) -> str:
     """
     Save an uploaded file to a specified directory.
@@ -92,17 +124,11 @@ def save_uploaded_file(uploaded_file) -> str:
     st.session_state["conversation_start_time"] = datetime.now()
     date_str = st.session_state["conversation_start_time"].strftime("%Y%m%d")
 
-    subdirectory = os.path.join(
-        upload_directory, f"{st.session_state['conversation_id']}_{date_str}"
-    )
-    if not os.path.exists(subdirectory):
-        os.makedirs(subdirectory)
+    path = f"{st.session_state['conversation_id']}_{date_str}/{uploaded_file.name}"
 
-    file_path = os.path.join(subdirectory, uploaded_file.name)
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    st.session_state["az_blob_manager"].write_object(path, uploaded_file.getbuffer())
 
-    return file_path
+    return path
 
 
 # UI setup
@@ -168,33 +194,6 @@ def clear_filename_history(file_name):
     st.session_state["display_files"].pop(file_name, None)
     st.session_state["clear_flag"][file_name] = True  # Set flag to indicate clearing
 
-
-def save_uploaded_file(uploaded_file):
-    # Create a directory for storing uploaded files if it doesn't exist
-    upload_directory = os.path.join("src", "app", "uploads")
-    if not os.path.exists(upload_directory):
-        os.makedirs(upload_directory)
-
-    # Generate a session ID and the current date
-    st.session_state["conversation_id"] = str(uuid.uuid4())
-    st.session_state["conversation_start_time"] = datetime.now()
-    date_str = st.session_state["conversation_start_time"].strftime("%Y%m%d")
-
-    # Create a subdirectory with the session ID and date
-    subdirectory = os.path.join(
-        upload_directory, f"{st.session_state['conversation_id']}_{date_str}"
-    )
-    if not os.path.exists(subdirectory):
-        os.makedirs(subdirectory)
-
-    # Create a file path
-    file_path = os.path.join(subdirectory, uploaded_file.name)
-
-    # Write the uploaded file to the new file path
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-
-    return file_path
 
 
 # File uploader for audio files
