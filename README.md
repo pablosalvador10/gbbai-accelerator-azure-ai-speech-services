@@ -2,13 +2,21 @@
 
 This project is a comprehensive guide to leveraging advanced AI services from Azure. It provides a hands-on approach to understanding and implementing the following services:
 
-- **Azure AI Speech Services**: This service offers robust capabilities for converting speech to text and text to speech. It uses Azure's cutting-edge speech recognition technology, which is trained on a wide range of data from various domains to ensure high accuracy across different scenarios.
+- **Azure AI Speech Services**: This service offers robust capabilities for converting speech to text and text to speech. It uses Azure's cutting-edge speech recognition technology, which is trained on a wide range of data from various domains to ensure high accuracy across different scenarios. You can learn more about this in the [01-speech-to-text.ipynb](01-speech-to-text.ipynb) notebook.
 
-- **Azure AI Language Understanding**: This service allows you to build applications that can understand user commands contextually. The project guides you on how to use intent recognition to derive meaningful insights from speech, enabling more natural interactions with your applications.
+- **Azure AI Language Understanding**: This service allows you to build applications that can understand user commands contextually. The project guides you on how to use intent recognition to derive meaningful insights from speech, enabling more natural interactions with your applications using Azure AI lenguage and Open AI models. Explore this in the [02-intent-recognition.ipynb](02-intent-recognition.ipynb) notebook.
 
-- **Azure OpenAI GPT-4 (turbo) and GPT-3.5**: These models offer advanced natural language processing and understanding capabilities. The project provides detailed steps on how to integrate these models into your applications to build sophisticated AI agents that can understand prompts, provide detailed responses, and even generate human-like text.
+- **Azure OpenAI GPT-4 (turbo) and GPT-3.5**: These models offer advanced natural language processing and understanding capabilities. The project provides detailed steps on how to integrate these models into your applications to build sophisticated AI agents that can understand prompts, provide detailed responses, and even generate human-like text. Dive into this topic in the [03-conversational-ai-agents.ipynb](03-conversational-ai-agents.ipynb) notebook.
 
-By following this project, you'll gain practical knowledge on how to integrate these powerful Azure AI services into your own applications.
+By following this project, you'll gain practical knowledge on how to integrate these powerful Azure AI services into your own applications. Start with the first notebook and work your way through. Happy learning!
+
+#### 🔄 Demo Application: Speech-to-Text-to-Speech
+
+Demonstrates an end-to-end application that recognizes speech, processes it using Azure OpenAI GPT-4 for NLU and NLG, and generates a speech response with Azure AI Speech Service.
+
+```bash
+make demo_app_speech_to_text_to_speech
+```
 
 ## 🔧 Prerequisites 
 
@@ -95,26 +103,6 @@ See also how to configure RHEL/CentOS 7 for Speech SDK [here](https://learn.micr
 You need the Microsoft Visual C++ Redistributable for Visual Studio 2017 for your platform. 
 
 More details (here) [https://github.com/Azure-Samples/cognitive-services-speech-sdk/tree/master/quickstart/python/from-microphone]
-
-## 🚀 Quick Start Guide
-
-This project includes several Jupyter notebooks that serve as interactive tutorials for different aspects of Azure's AI Services. Here's a brief overview of each notebook:
-
-- [01-speech-to-text.ipynb](01-speech-to-text.ipynb): Learn how to convert spoken language into written text using Azure's AI Speech Services. This step-by-step guide will walk you through the process, from setting up the service to implementing it in your applications.
-
-- [02-intent-recognition.ipynb](02-intent-recognition.ipynb): Explore the world of intent recognition. This tutorial dives deep into how you can use Azure's AI Services to understand the purpose or goal behind spoken commands, enabling more natural interactions with your applications.
-
-- [03-conversational-ai-agents.ipynb](03-conversational-ai-agents.ipynb): Get introduced to conversational AI agents. This guide showcases how you can leverage Azure's advanced natural language processing and understanding capabilities to build sophisticated AI agents that can engage in human-like conversations. (#TODO)
-
-Start with the first notebook and work your way through. Happy learning!
-
-#### 🔄 Demo Application: Speech-to-Text-to-Speech
-
-Demonstrates an end-to-end application that recognizes speech, processes it using Azure OpenAI GPT-4 for NLU and NLG, and generates a speech response with Azure AI Speech Service.
-
-```bash
-make demo_app_speech_to_text_to_speech
-```
 
 ## 💼 Contributing
 

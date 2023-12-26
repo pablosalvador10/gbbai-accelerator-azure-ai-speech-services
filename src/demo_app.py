@@ -2,14 +2,17 @@ import os
 import time
 
 from src.aoai.intent_azure_openai import AzureOpenAIAssistant
-from src.speech.speech_recognizer import recognize_from_microphone
-from src.speech.text_to_speech import synthesize_speech
+from src.speech.speech_recognizer import SpeechRecognizer
+from src.speech.text_to_speech import SpeechSynthesizer
 from utils.ml_logging import get_logger
 
 # Set up logger
 logger = get_logger()
 
 az_openai_client = AzureOpenAIAssistant()
+az_speech_recognizer_client = SpeechRecognizer()
+az_speach_synthesizer_client = SpeechSynthesizer()
+
 
 # Load environment variables
 SPEECH_KEY = os.getenv("SPEECH_KEY")
@@ -41,7 +44,7 @@ def handle_speech_recognition() -> str:
         str: The recognized speech as text.
     """
     logger.info("Recognizing speech from microphone...")
-    prompt, _ = recognize_from_microphone(SPEECH_KEY, SPEECH_REGION)
+    prompt, _ = az_speech_recognizer_client.recognize_from_microphone()
     return prompt
 
 
@@ -63,28 +66,25 @@ def main():
 
                 if check_for_stopwords(prompt):
                     logger.info("Stop word detected, exiting...")
-                    synthesize_speech("Goodbye.", SPEECH_KEY, SPEECH_REGION)
+                    az_speach_synthesizer_client.synthesize_speech("Goodbye.")
                     break
 
                 response = az_openai_client.generate_text_with_contextual_history(
                     conversation_history,
                     prompt,
-                    deployment_name="foundational-canadaeast-gpt4",
                 )
 
                 if response:
                     logger.info(f"Generated response: {response}")
-                    synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
+                    az_speach_synthesizer_client.synthesize_speech(response)
                 else:
                     logger.warning("No response generated.")
             elif time.time() - last_speech_time > SILENCE_THRESHOLD:
                 logger.info(
                     f"No speech detected for over {SILENCE_THRESHOLD} seconds, exiting..."
                 )
-                synthesize_speech(
-                    f"No speech detected for over {SILENCE_THRESHOLD} seconds. Goodbye.",
-                    SPEECH_KEY,
-                    SPEECH_REGION,
+                az_speach_synthesizer_client.synthesize_speech(
+                    f"No speech detected for over {SILENCE_THRESHOLD} seconds. Goodbye."
                 )
                 break
             else:
