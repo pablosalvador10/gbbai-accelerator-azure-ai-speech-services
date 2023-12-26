@@ -162,7 +162,9 @@ async def send_receive(key, region):
                     stop_listening()
                     break
 
-                response = st.session_state["az_aoai"].generate_text_with_contextual_history(
+                response = st.session_state[
+                    "az_aoai"
+                ].generate_text_with_contextual_history(
                     [],
                     prompt,
                     deployment_name="foundational-canadaeast-gpt4",

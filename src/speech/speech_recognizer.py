@@ -13,6 +13,7 @@ logger = get_logger()
 # Load environment variables from .env file
 load_dotenv()
 
+
 class SpeechRecognizer:
     """
     A class that encapsulates the Azure Cognitive Services Speech SDK functionality for recognizing speech.
@@ -31,14 +32,18 @@ class SpeechRecognizer:
         self.region = region if region is not None else os.getenv("SPEECH_REGION")
         self.language = language
 
-    def recognize_from_microphone(self) -> Tuple[str, Optional[SpeechRecognitionResult]]:
+    def recognize_from_microphone(
+        self,
+    ) -> Tuple[str, Optional[SpeechRecognitionResult]]:
         """
         Recognizes speech from the microphone.
 
         Returns:
             Tuple[str, Optional[SpeechRecognitionResult]]: The recognized text and the result object.
         """
-        speech_config = speechsdk.SpeechConfig(subscription=self.key, region=self.region)
+        speech_config = speechsdk.SpeechConfig(
+            subscription=self.key, region=self.region
+        )
         speech_config.speech_recognition_language = self.language
 
         audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
@@ -63,7 +68,9 @@ class SpeechRecognizer:
                 "Speech Recognition canceled: {}".format(cancellation_details.reason)
             )
             if cancellation_details.reason == speechsdk.CancellationReason.Error:
-                logger.error("Error details: {}".format(cancellation_details.error_details))
+                logger.error(
+                    "Error details: {}".format(cancellation_details.error_details)
+                )
                 logger.error("Did you set the speech resource key and region values?")
 
         # Return the recognized text and the result object

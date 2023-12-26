@@ -2,11 +2,8 @@ import os
 from typing import Optional
 
 import azure.cognitiveservices.speech as speechsdk
+from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesisResult
 from azure.cognitiveservices.speech.audio import AudioOutputConfig
-from azure.cognitiveservices.speech import (
-    SpeechConfig,
-    SpeechSynthesisResult,
-)
 
 from utils.ml_logging import get_logger
 
@@ -35,7 +32,7 @@ class SpeechSynthesizer:
         return speechsdk.SpeechSynthesizer(
             speech_config=speech_config, audio_config=audio_config
         )
-    
+
     def synthesize_speech(self, text: str) -> Optional[SpeechSynthesisResult]:
         """
         Synthesizes speech from the provided text using the Azure Speech SDK.

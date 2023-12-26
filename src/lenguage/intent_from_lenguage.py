@@ -12,6 +12,7 @@ from utils.ml_logging import get_logger
 load_dotenv()
 logger = get_logger()
 
+
 class IntentRecognizer:
     """
     A class that encapsulates the Azure Cognitive Services Lenguage SDK functionality for recognizing intents.
@@ -52,9 +53,8 @@ class IntentRecognizer:
 
         return intent_counts
 
-
-    def recognize_intent_continuous(self,
-        file_name: str, intents_list: List[str]
+    def recognize_intent_continuous(
+        self, file_name: str, intents_list: List[str]
     ) -> str:
         """
         Performs continuous intent recognition from input from an audio file.
@@ -68,16 +68,16 @@ class IntentRecognizer:
         """
         logger.info("Starting continuous intent recognition...")
         log_audio_characteristics(file_name)
-        intent_config = speechsdk.SpeechConfig(subscription=self.key, region=self.region)
+        intent_config = speechsdk.SpeechConfig(
+            subscription=self.key, region=self.region
+        )
         audio_config = speechsdk.audio.AudioConfig(filename=file_name)
         intent_recognizer = speechsdk.intent.IntentRecognizer(
             speech_config=intent_config, audio_config=audio_config
         )
 
         # Set up the intents to be recognized
-        model = speechsdk.intent.LanguageUnderstandingModel(
-            app_id=self.app_id
-        )
+        model = speechsdk.intent.LanguageUnderstandingModel(app_id=self.app_id)
         intents = [
             (model, "HomeAutomation.TurnOn"),
             (model, "HomeAutomation.TurnOff"),
@@ -112,7 +112,9 @@ class IntentRecognizer:
             lambda evt: logger.info(f"RECOGNIZING: {evt}")
         )
         intent_recognizer.canceled.connect(
-            lambda evt: logger.info(f"CANCELED: {evt.cancellation_details} ({evt.reason})")
+            lambda evt: logger.info(
+                f"CANCELED: {evt.cancellation_details} ({evt.reason})"
+            )
         )
         intent_recognizer.session_stopped.connect(stop_cb)
         intent_recognizer.canceled.connect(stop_cb)
@@ -131,9 +133,8 @@ class IntentRecognizer:
         logger.info("Finished continuous intent recognition.")
         return final_intent
 
-
-    def recognize_intent_once_from_file(self,
-        file_name: str, intents_list: List[str]
+    def recognize_intent_once_from_file(
+        self, file_name: str, intents_list: List[str]
     ) -> None:
         """
         Performs one-shot intent recognition from input from an audio file.
@@ -147,16 +148,16 @@ class IntentRecognizer:
         """
         logger.info("Starting one-shot intent recognition...")
 
-        intent_config = speechsdk.SpeechConfig(subscription=self.key, region=self.region)
+        intent_config = speechsdk.SpeechConfig(
+            subscription=self.key, region=self.region
+        )
         audio_config = speechsdk.audio.AudioConfig(filename=file_name)
 
         intent_recognizer = speechsdk.intent.IntentRecognizer(
             speech_config=intent_config, audio_config=audio_config
         )
 
-        model = speechsdk.intent.LanguageUnderstandingModel(
-            app_id=self.app_id
-        )
+        model = speechsdk.intent.LanguageUnderstandingModel(app_id=self.app_id)
         intents = [
             (model, "HomeAutomation.TurnOn"),
             (model, "HomeAutomation.TurnOff"),
@@ -174,7 +175,9 @@ class IntentRecognizer:
         elif intent_result.reason == speechsdk.ResultReason.RecognizedSpeech:
             logger.info(f"Recognized: {intent_result.text}")
         elif intent_result.reason == speechsdk.ResultReason.NoMatch:
-            logger.info(f"No speech could be recognized: {intent_result.no_match_details}")
+            logger.info(
+                f"No speech could be recognized: {intent_result.no_match_details}"
+            )
         elif intent_result.reason == speechsdk.ResultReason.Canceled:
             logger.info(
                 f"Intent recognition canceled: {intent_result.cancellation_details.reason}"
@@ -203,15 +206,18 @@ def main():
         ("What is the {date}?", "queryDate"),
     ]
 
+    # Create an instance of the IntentRecognizer class
+    intent_recognizer = IntentRecognizer()
+
     try:
-        recognize_intent_continuous(args.file, SPEECH_KEY, SPEECH_REGION, intent_list)
+        # Call the recognize_intent_continuous method of the intent_recognizer object
+        intent_recognizer.recognize_intent_continuous(args.file, intent_list)
     except Exception as e:
         logger.error(f"Failed to recognize intent: {e}")
 
     try:
-        recognize_intent_once_from_file(
-            args.file, SPEECH_KEY, SPEECH_REGION, intent_list
-        )
+        # Call the recognize_intent_once_from_file method of the intent_recognizer object
+        intent_recognizer.recognize_intent_once_from_file(args.file, intent_list)
     except Exception as e:
         logger.error(f"Failed to recognize intent: {e}")
 

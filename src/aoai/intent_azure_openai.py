@@ -1,11 +1,11 @@
 import argparse
 import os
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 import openai
 from dotenv import load_dotenv
 
-from src.speech.speech_to_text import transcribe_speech_from_file_continuous
+from src.speech.speech_to_text import SpeechTranscriber
 from utils.ml_logging import get_logger
 
 # Load environment variables from .env file
@@ -13,6 +13,8 @@ load_dotenv()
 
 # Set up logger
 logger = get_logger()
+
+speech_transcriber = SpeechTranscriber()
 
 
 class AzureOpenAIAssistant:
@@ -126,7 +128,7 @@ class AzureOpenAIAssistant:
                 messages=messages_for_api,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                seed = 42,
+                seed=42,
             )
 
             response_content = response["choices"][0]["message"]["content"]
@@ -162,22 +164,23 @@ class AzureOpenAIAssistant:
             Optional[str]: The summary and intent classification or None if an error occurs.
         """
         try:
-
             system_message_content = (
-                    f"As an AI assistant, you will perform two actions on the following text. "
-                    f"First, you should provide a concise, professional summary. "
-                    f"Second, you should analyze and clearly state the primary intent of the text. in this format: \n\n"
-                    f"---\n\n"
-                    f"Summary and Intent Classification:")
-  
+                "As an AI assistant, you will perform two actions on the following text. "
+                "First, you should provide a concise, professional summary. "
+                "Second, you should analyze and clearly state the primary intent of the text. in this format: \n\n"
+                "---\n\n"
+                "Summary and Intent Classification:"
+            )
 
-            response = self.generate_text_with_contextual_history(conversation_history=[],
-                                                                  latest_prompt=text,
-                                                                  system_message_content=system_message_content,
-                                                                  max_tokens=300)
+            response = self.generate_text_with_contextual_history(
+                conversation_history=[],
+                latest_prompt=text,
+                system_message_content=system_message_content,
+                max_tokens=300,
+            )
 
             logger.info(
-             f"Summarization and intent classification successful. Response: {response}"
+                f"Summarization and intent classification successful. Response: {response}"
             )
 
             return response
@@ -201,7 +204,7 @@ def transcribe_summarize_and_gather_intent_from_audio_file() -> Optional[str]:
     parser.add_argument("--file", required=True, help="The path to the audio file.")
     args = parser.parse_args()
 
-    transcription = transcribe_speech_from_file_continuous(
+    transcription = speech_transcriber.transcribe_speech_from_blob_continuous(
         file_name=args.file, key=assistant.speech_key, region=assistant.speech_region
     )
     if transcription:

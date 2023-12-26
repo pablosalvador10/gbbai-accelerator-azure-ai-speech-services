@@ -6,9 +6,9 @@ from datetime import datetime
 import streamlit as st
 
 from src.aoai.intent_azure_openai import AzureOpenAIAssistant
-from utils.azure_blob import AzureBlobManager
 from src.speech.speech_to_text import transcribe_speech_from_file_continuous
 from src.speech.text_to_speech import synthesize_speech
+from utils.azure_blob import AzureBlobManager
 from utils.ml_logging import get_logger
 
 # Set up logger and environment variables
@@ -28,7 +28,7 @@ if "az_aoai_manager" not in st.session_state:
     st.session_state["az_aoai_manager"] = AzureOpenAIAssistant()
 if "az_blob_manager" not in st.session_state:
     st.session_state["az_blob_manager"] = AzureBlobManager(container_name="speechapp")
-    
+
 
 def get_image_base64(image_path: str) -> str:
     """
@@ -66,8 +66,12 @@ def summarize(text: str) -> str:
     :param text: The text to be summarized.
     :return: Summarized text and its intent.
     """
-    with st.spinner(f"🤖 Summarizing and extracting intent from the text... Please wait."):
-        response = st.session_state["az_aoai_manager"].summarize_and_classify_intent(text=text)
+    with st.spinner(
+        "🤖 Summarizing and extracting intent from the text... Please wait."
+    ):
+        response = st.session_state["az_aoai_manager"].summarize_and_classify_intent(
+            text=text
+        )
     return response
 
 
@@ -108,7 +112,8 @@ def clear_filename_history(file_name: str):
 #         f.write(uploaded_file.getbuffer())
 
 #     return file_path
-    
+
+
 def save_uploaded_file(uploaded_file) -> str:
     """
     Save an uploaded file to a specified directory.
@@ -193,7 +198,6 @@ def clear_filename_history(file_name):
     st.session_state["transcribed_texts"].pop(file_name, None)
     st.session_state["display_files"].pop(file_name, None)
     st.session_state["clear_flag"][file_name] = True  # Set flag to indicate clearing
-
 
 
 # File uploader for audio files
