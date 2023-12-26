@@ -9,6 +9,8 @@ from src.gbb_ai.pdf_data_extractor import PDFHelper
 from dotenv import load_dotenv
 from docx import Document
 from utils.ml_logging import get_logger
+from pydub import AudioSegment
+
 
 logger = get_logger()
 pdf_helper = PDFHelper()
@@ -102,6 +104,9 @@ class AzureBlobManager:
             elif file_format == "txt":
                 data = content.decode()
                 logger.info(f"Successfully loaded TXT file {file_name}")
+            elif file_format in ["pcm", "mp3", "wav", "flac", "aac"]:
+                data = AudioSegment.from_file(io.BytesIO(content), format=file_format)
+                logger.info(f"Successfully loaded {file_format.upper()} file {file_name}")
             else:
                 logger.error(f"Unsupported file format: {file_format}")
                 raise ValueError("Unsupported file format: " + file_format)

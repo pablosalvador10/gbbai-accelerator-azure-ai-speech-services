@@ -29,10 +29,6 @@ def log_audio_characteristics(file_name: str):
         # Log basic audio information
         logger.info(f"Audio file characteristics for {file_name}:")
         logger.info(f"Number of channels: {audio.channels}")
-
-        sample_width = audio.sample_width
-        logger.info(f"Sample width (bytes): {sample_width}")
-
         logger.info(f"Sampling frequency (Hz): {audio.frame_rate}")
 
         # Calculate number of frames
