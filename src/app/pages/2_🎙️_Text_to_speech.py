@@ -6,8 +6,8 @@ from datetime import datetime
 import streamlit as st
 
 from src.aoai.intent_azure_openai import AzureOpenAIAssistant
-from src.speech.speech_to_text import transcribe_speech_from_file_continuous
-from src.speech.text_to_speech import synthesize_speech
+from src.speech.speech_to_text import SpeechTranscriber
+from src.speech.text_to_speech import SpeechSynthesizer
 from utils.azure_blob import AzureBlobManager
 from utils.ml_logging import get_logger
 
@@ -28,6 +28,12 @@ if "az_aoai_manager" not in st.session_state:
     st.session_state["az_aoai_manager"] = AzureOpenAIAssistant()
 if "az_blob_manager" not in st.session_state:
     st.session_state["az_blob_manager"] = AzureBlobManager(container_name="speechapp")
+if "az_speech_manager" not in st.session_state:
+    st.session_state["az_speech_manager"] = SpeechTranscriber()
+if "az_blob_manager" not in st.session_state:
+    st.session_state["az_blob_manager"] = AzureBlobManager(container_name="speechapp")
+if "az_synthesizer_manager" not in st.session_state:
+    st.session_state["az_synthesizer_manager"] = SpeechSynthesizer()
 
 
 def get_image_base64(image_path: str) -> str:
@@ -53,7 +59,7 @@ def transcribe_with_progress(
     :return: Transcribed text.
     """
     with st.spinner(f"🤖 Transcribing {file_name}... Please wait."):
-        transcribed_text = transcribe_speech_from_file_continuous(
+        transcribed_text = st.session_state["az_speech_manager"].transcribe_speech_from_file_continuous(
             file_path, key, region
         )
     return transcribed_text
@@ -113,7 +119,6 @@ def clear_filename_history(file_name: str):
 
 #     return file_path
 
-
 def save_uploaded_file(uploaded_file) -> str:
     """
     Save an uploaded file to a specified directory.
@@ -134,7 +139,6 @@ def save_uploaded_file(uploaded_file) -> str:
     st.session_state["az_blob_manager"].write_object(path, uploaded_file.getbuffer())
 
     return path
-
 
 # UI setup
 st.markdown(
@@ -231,7 +235,7 @@ for uploaded_file in uploaded_files:
 
         col1, col2, col3 = st.columns(3)
         if col1.button("🔊 Generate Speech", key=f"synthesize_{file_name}"):
-            synthesize_speech(text_display, SPEECH_KEY, SPEECH_REGION)
+            st.session_state["az_synthesizer_manager"].synthesize_speech(text_display, SPEECH_KEY, SPEECH_REGION)
         if col2.button("📝 Summarize Text", key=f"summarize_{file_name}"):
             text = summarize(st.session_state["transcribed_texts"][file_name])
             st.text_area(

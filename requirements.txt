@@ -1,13 +1,11 @@
-# app front-end
-streamlit
-pyaudio
-
-# core azure ai development
+# azure ai development
 openai
 azure-cognitiveservices-speech
 azure-ai-ml
 azure-identity
 pydub
 sounddevice
+python-docx
+PyPDF2
 
 # more specialized packages ai azure services -> https://azure.github.io/azure-sdk/releases/latest/all/python.html

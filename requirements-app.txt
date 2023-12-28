@@ -1,0 +1,4 @@
+# app front-end
+streamlit
+pyaudio
+

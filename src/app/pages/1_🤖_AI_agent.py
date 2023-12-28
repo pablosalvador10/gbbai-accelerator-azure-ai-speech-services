@@ -9,8 +9,9 @@ import streamlit as st
 from src.aoai.intent_azure_openai import AzureOpenAIAssistant
 
 # Import your Azure AI Speech to Text function
-from src.speech.speech_recognizer import recognize_from_microphone
-from src.speech.text_to_speech import synthesize_speech
+from src.speech.speech_to_text import SpeechTranscriber
+from src.speech.text_to_speech import SpeechSynthesizer
+from src.speech.speech_recognizer import SpeechRecognizer
 from utils.ml_logging import get_logger
 
 # Set up logger and environment variables
@@ -29,7 +30,12 @@ if "conversation_history" not in st.session_state:
     st.session_state["run"] = False
 if "az_aoai" not in st.session_state:
     st.session_state["az_aoai"] = AzureOpenAIAssistant()
-
+if "az_synthesizer_manager" not in st.session_state:
+    st.session_state["az_synthesizer_manager"] = SpeechSynthesizer()
+if "az_speech_manager" not in st.session_state:
+    st.session_state["az_speech_manager"] = SpeechTranscriber()
+if "az_speech_recognizer" not in st.session_state:
+    st.session_state["az_speech_recognizer"] = SpeechRecognizer()
 
 # Function to convert image to base64
 def get_image_base64(image_path):
@@ -56,7 +62,7 @@ def start_listening(key, region):
     st.sidebar.markdown("#### Live Conversation:")
     with st.sidebar:
         st.write(f"🤖 AI System: {response}")
-    synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
+    st.session_state["az_synthesizer_manager"].synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
     asyncio.run(send_receive(key, region))
 
 
@@ -143,7 +149,7 @@ async def send_receive(key, region):
 
     while st.session_state["run"]:
         try:
-            prompt, _ = recognize_from_microphone(key, region)
+            prompt, _ = st.session_state["az_speech_recognizer"].recognize_from_microphone(key, region)
             if prompt:
                 last_speech_time = asyncio.get_event_loop().time()
                 st.session_state["conversation_history"].append(f"User: {prompt}")
@@ -153,7 +159,7 @@ async def send_receive(key, region):
                 if any(stop_word in prompt.lower() for stop_word in STOP_WORDS):
                     st.session_state["run"] = False
                     response = "Goodbye. I hope I was able to help you today."
-                    synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
+                    st.session_state["az_synthesizer_manager"].synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
                     st.session_state["conversation_history"].append(
                         f"AI System: {response}"
                     )
@@ -170,7 +176,7 @@ async def send_receive(key, region):
                     deployment_name="foundational-canadaeast-gpt4",
                 )
                 if response:
-                    synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
+                    st.session_state["az_synthesizer_manager"].synthesize_speech(response, SPEECH_KEY, SPEECH_REGION)
                     st.session_state["conversation_history"].append(
                         f"AI System: {response}"
                     )

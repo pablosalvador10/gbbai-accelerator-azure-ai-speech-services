@@ -10,7 +10,7 @@ from docx import Document
 from dotenv import load_dotenv
 from pydub import AudioSegment
 
-from src.gbb_ai.pdf_data_extractor import PDFHelper
+from utils.pdf_data_extractor import PDFHelper
 from utils.ml_logging import get_logger
 
 logger = get_logger()
