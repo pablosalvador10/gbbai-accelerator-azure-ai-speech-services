@@ -1,14 +1,11 @@
-import os
 import wave
-
-from pydub import AudioSegment
 
 from utils.ml_logging import get_logger
 
 logger = get_logger()
 
 
-def check_audio_file(file_path):
+def check_audio_file(file_path: str) -> bool:
     """
     Checks the format of the audio stream from the provided WAV file and logs the details.
     Returns False if any of the required conditions are not met. Otherwise, returns True.
@@ -59,33 +56,29 @@ def check_audio_file(file_path):
         )
 
 
-def log_audio_characteristics(file_name: str):
+def log_audio_characteristics(file_path: str):
     """
-    Logs the characteristics of an audio file.
-
-    Args:
-        file_name (str): The path to the audio file.
-
-    Returns:
-        None
+    Logs the format of the audio stream from the provided WAV file.
+    Parameters:
+    file_path (str): Path to the WAV file to be checked.
     """
-    # Check if file exists
-    if not os.path.exists(file_name):
-        logger.error(f"File not found: {file_name}")
-        return
+    with wave.open(file_path, "rb") as wav_file:
+        (
+            n_channels,
+            sampwidth,
+            framerate,
+            nframes,
+            comptype,
+            compname,
+        ) = wav_file.getparams()
 
-    try:
-        # Load audio file directly without converting to a different format
-        audio = AudioSegment.from_file(file_name)
+        logger.info(f"Number of Channels: {n_channels}")
+        logger.info(f"Sample Width: {sampwidth}")
+        logger.info(f"Frame Rate: {framerate}")
+        logger.info(f"Number of Frames: {nframes}")
+        logger.info(f"Compression Type: {comptype}")
+        logger.info(f"Compression Name: {compname}")
 
-        # Log basic audio information
-        logger.info(f"Audio file characteristics for {file_name}:")
-        logger.info(f"Number of channels: {audio.channels}")
-        logger.info(f"Sampling frequency (Hz): {audio.frame_rate}")
-
-        # Calculate number of frames
-        number_of_frames = len(audio)
-        logger.info(f"Number of frames: {number_of_frames}")
-
-    except Exception as e:
-        logger.error(f"An error occurred while analyzing the audio file: {e}")
+        # Calculate bytes per second
+        bytes_per_second = framerate * sampwidth * n_channels
+        logger.info(f"Bytes Per Second: {bytes_per_second}")

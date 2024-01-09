@@ -10,8 +10,8 @@ from docx import Document
 from dotenv import load_dotenv
 from pydub import AudioSegment
 
-from utils.pdf_data_extractor import PDFHelper
 from utils.ml_logging import get_logger
+from utils.pdf_data_extractor import PDFHelper
 
 logger = get_logger()
 pdf_helper = PDFHelper()

@@ -4,6 +4,7 @@ import tempfile
 import time
 import urllib.parse
 import wave
+from typing import List, Optional
 
 import azure.cognitiveservices.speech as speechsdk
 import numpy as np
@@ -19,7 +20,7 @@ logger = get_logger()
 
 class SpeechTranscriber:
     """
-    A class that encapsulates the Azure Cognitive Services Speech SDK functionality for transcribing speech.
+    A class that encapsulates the Azure AI Services Speech SDK functionality for transcribing speech.
     """
 
     def __init__(self):
@@ -29,16 +30,28 @@ class SpeechTranscriber:
         self.speech_config = speechsdk.SpeechConfig(
             subscription=self.speech_key, region=self.speech_region
         )
+        self.supported_languages = [
+            "en-US",  # English (United States)
+            "es-ES",  # Spanish (Spain)
+            "fr-FR",  # French (France)
+        ]
+
+    def add_supported_language(self, language):
+        """
+        Appends a language to the list of supported languages.
+        Parameters:
+        language (str): The language to be added.
+        """
+        self.supported_languages.append(language)
 
     def get_blob_client_from_url(self, blob_url: str):
         """
         Retrieves a BlobClient object for the specified blob URL.
 
-        Args:
-            blob_url (str): The URL of the blob.
-
-        Returns:
-            Optional[BlobClient]: A BlobClient object for the specified blob URL, or None if the connection string is not set.
+        :param blob_url: The URL of the blob.
+        :type blob_url: str
+        :return: A BlobClient object for the specified blob URL, or None if the connection string is not set.
+        :rtype: Optional[BlobClient]
         """
         parsed_url = urllib.parse.urlparse(blob_url)
         blob_name = os.path.basename(parsed_url.path)
@@ -58,11 +71,10 @@ class SpeechTranscriber:
         """
         Transcribes speech from an audio file using Azure Cognitive Services Speech SDK.
 
-        Args:
-            file_name (str): The name of the audio file to transcribe.
-
-        Returns:
-            str: The transcribed text from the audio file.
+        :param file_name: The name of the audio file to transcribe.
+        :type file_name: str
+        :return: The transcribed text from the audio file.
+        :rtype: str
         """
         audio_config = speechsdk.AudioConfig(filename=file_name)
         speech_recognizer = speechsdk.SpeechRecognizer(
@@ -71,98 +83,148 @@ class SpeechTranscriber:
 
         logger.info(f"Transcribing speech from file: {file_name}")
         result = speech_recognizer.recognize_once_async().get()
-        return self.process_recognition_result(result)
 
-    def process_recognition_result(self, result):
+        return self._process_recognition_result(result)
+
+    @staticmethod
+    def _validate_inputs(
+        file_path: Optional[str],
+        blob_url: Optional[str],
+        language: Optional[str],
+        auto_detect_source_language: Optional[bool],
+    ):
+        if not file_path and not blob_url:
+            raise ValueError("Either file_path or blob_url must be provided.")
+
+        if language and auto_detect_source_language:
+            raise ValueError(
+                "Only one of language or auto_detect_source_language can be provided."
+            )
+
+        if blob_url and "blob.core.windows.net" not in blob_url:
+            raise ValueError("Invalid blob URL format.")
+
+    def transcribe_speech_from_file_continuous(
+        self,
+        file_path: Optional[str] = None,
+        blob_url: Optional[str] = None,
+        language: Optional[str] = None,
+        auto_detect_source_language: Optional[bool] = False,
+        auto_detect_supported_languages: Optional[List[str]] = None,
+        source_language_config: Optional[speechsdk.SourceLanguageConfig] = None,
+    ) -> str:
+        """
+        Performs continuous speech recognition with input from an audio file or blob.
+
+        :param file_path: Path to the local audio file, optional.
+        :param blob_url: URL of the blob containing the audio file, optional.
+        :param language: Language code for speech recognition, optional.
+        :param auto_detect_source_language: Whether to auto detect source language, optional.
+        :param auto_detect_supported_languages: List of supported languages for auto detection, optional.
+        :param source_language_config: Configuration for source language, optional.
+        :return: Transcribed text from the audio source.
+        :raises ValueError: If neither file_path nor blob_url is provided, or if both language and auto_detect_source_language are provided.
+        """
+        self._validate_inputs(
+            file_path, blob_url, language, auto_detect_source_language
+        )
+
+        if auto_detect_source_language:
+            auto_detect_source_language_config = (
+                speechsdk.languageconfig.AutoDetectSourceLanguageConfig(
+                    languages=auto_detect_supported_languages
+                    if auto_detect_supported_languages is not None
+                    else self.supported_languages
+                )
+            )
+        else:
+            auto_detect_source_language_config = None
+
+        if file_path:
+            return self._transcribe_from_file(
+                file_path,
+                language,
+                source_language_config,
+                auto_detect_source_language_config,
+            )
+
+        return self._transcribe_from_blob(
+            blob_url,
+            language,
+            source_language_config,
+            auto_detect_source_language_config,
+        )
+
+    def _process_recognition_result(self, result):
         """
         Processes the result of a speech recognition operation.
 
-        Args:
-            result (speechsdk.SpeechRecognitionResult): The result of the speech recognition operation.
-
-        Returns:
-            str: The transcribed text from the speech recognition result.
+        :param result: The result of the speech recognition operation.
+        :return: The transcribed text from the speech recognition result.
         """
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
             logger.info(f"Transcription result: {result.text}")
-        elif result.reason == speechsdk.ResultReason.NoMatch:
+        elif result.reason in [
+            speechsdk.ResultReason.NoMatch,
+            speechsdk.ResultReason.Canceled,
+        ]:
+            self._handle_unsuccessful_transcription(result)
+        return result.text
+
+    def _handle_unsuccessful_transcription(self, result):
+        """
+        Handles unsuccessful transcription attempts.
+
+        :param result: The result of the speech recognition operation.
+        """
+        if result.reason == speechsdk.ResultReason.NoMatch:
             logger.warning(f"No speech could be recognized: {result.no_match_details}")
         elif result.reason == speechsdk.ResultReason.Canceled:
             cancellation_details = result.cancellation_details
             logger.error(f"Speech Recognition canceled: {cancellation_details.reason}")
             if cancellation_details.reason == speechsdk.CancellationReason.Error:
                 logger.error(f"Error details: {cancellation_details.error_details}")
-        return result.text
 
-    def transcribe_speech_from_file_continuous(self, file_name: str, language: str = None, source_language_config: speechsdk.SourceLanguageConfig = None, auto_detect_source_language_config: speechsdk.AutoDetectSourceLanguageConfig = None) -> str:
+    def _transcribe_from_file(
+        self,
+        file_path: str,
+        language: str,
+        source_language_config,
+        auto_detect_source_language_config,
+    ) -> str:
         """
-        Performs continuous speech recognition with input from an audio file.
+        Helper function to transcribe from a local file.
 
-        Args:
-            file_name (str): The name of the audio file to transcribe.
-            language (str, optional): The language to use for speech recognition. Defaults to None.
-            source_language_config (SourceLanguageConfig, optional): The source language configuration. Defaults to None.
-            auto_detect_source_language_config (AutoDetectSourceLanguageConfig, optional): The auto detect source language configuration. Defaults to None.
-
-        Returns:
-            str: The transcribed text from the audio file.
+        :param file_path: Path to the audio file.
+        :param language: Language code for speech recognition.
+        :param source_language_config: Configuration for source language.
+        :param auto_detect_source_language_config: Configuration for auto detecting source language.
+        :return: Transcribed text.
         """
-        audio_config = speechsdk.AudioConfig(filename=file_name)
-        speech_recognizer = speechsdk.SpeechRecognizer(
-            speech_config=self.speech_config, 
-            audio_config=audio_config,
-            language=language,
-            source_language_config=source_language_config,
-            auto_detect_source_language_config=auto_detect_source_language_config
+        audio_config = speechsdk.AudioConfig(filename=file_path)
+        return self._transcribe(
+            audio_config,
+            language,
+            source_language_config,
+            auto_detect_source_language_config,
         )
 
-        done = False
-        final_text = ""
-
-        def update_final_text(evt):
-            nonlocal final_text
-            final_text += " " + evt.result.text
-
-        def stop_cb(evt: speechsdk.SessionEventArgs):
-            logger.info(f"CLOSING on {evt}")
-            nonlocal done
-            done = True
-
-        speech_recognizer.recognizing.connect(
-            lambda evt: logger.info(f"RECOGNIZING: {evt}")
-        )
-        speech_recognizer.recognized.connect(update_final_text)
-        speech_recognizer.session_started.connect(
-            lambda evt: logger.info(f"SESSION STARTED: {evt}")
-        )
-        speech_recognizer.session_stopped.connect(
-            lambda evt: logger.info(f"SESSION STOPPED {evt}")
-        )
-        speech_recognizer.canceled.connect(lambda evt: logger.info(f"CANCELED {evt}"))
-        speech_recognizer.session_stopped.connect(stop_cb)
-        speech_recognizer.canceled.connect(stop_cb)
-
-        speech_recognizer.start_continuous_recognition()
-        while not done:
-            time.sleep(0.01)
-        speech_recognizer.stop_continuous_recognition()
-
-        return final_text.strip()
-
-    def transcribe_speech_from_blob_continuous(self, blob_url: str, language: str = None, source_language_config: speechsdk.SourceLanguageConfig = None, auto_detect_source_language_config: speechsdk.AutoDetectSourceLanguageConfig = None) -> str:
+    def _transcribe_from_blob(
+        self,
+        blob_url: str,
+        language: str,
+        source_language_config,
+        auto_detect_source_language_config,
+    ) -> str:
         """
-        Performs continuous speech recognition with input from an audio file stored in a blob.
+        Helper function to transcribe from a blob.
 
-        Args:
-            blob_url (str): The URL of the blob containing the audio file to transcribe.
-            language (str, optional): The language to use for speech recognition. Defaults to None.
-            source_language_config (SourceLanguageConfig, optional): The source language configuration. Defaults to None.
-            auto_detect_source_language_config (AutoDetectSourceLanguageConfig, optional): The auto detect source language configuration. Defaults to None.
-
-        Returns:
-            Optional[str]: The transcribed text from the audio file, or None if the blob client could not be created.
+        :param blob_url: URL of the blob containing the audio file.
+        :param language: Language code for speech recognition.
+        :param source_language_config: Configuration for source language.
+        :param auto_detect_source_language_config: Configuration for auto detecting source language.
+        :return: Transcribed text, or None if blob client could not be created.
         """
-
         blob_client = self.get_blob_client_from_url(blob_url)
         if blob_client is None:
             return None
@@ -170,30 +232,100 @@ class SpeechTranscriber:
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             download_stream = blob_client.download_blob()
             temp_file.write(download_stream.readall())
+            audio_config = speechsdk.AudioConfig(filename=temp_file.name)
 
-        audio_config = speechsdk.AudioConfig(filename=temp_file.name)
+        try:
+            result = self._transcribe(
+                audio_config,
+                language,
+                source_language_config,
+                auto_detect_source_language_config,
+            )
+        finally:
+            try:
+                os.remove(temp_file.name)
+            except OSError as e:
+                logger.warning(f"Error deleting temporary file: {e}")
+
+        return result
+
+    def _transcribe(
+        self,
+        audio_config,
+        language,
+        source_language_config,
+        auto_detect_source_language_config,
+    ) -> str:
+        """
+        Core function to handle speech recognition and transcription.
+
+        :param audio_config: Audio configuration object.
+        :param language: Language code for speech recognition.
+        :param source_language_config: Configuration for source language.
+        :param auto_detect_source_language_config: Configuration for auto detecting source language.
+        :return: Transcribed text.
+        """
         speech_recognizer = speechsdk.SpeechRecognizer(
-            speech_config=self.speech_config, 
+            speech_config=self.speech_config,
             audio_config=audio_config,
             language=language,
             source_language_config=source_language_config,
-            auto_detect_source_language_config=auto_detect_source_language_config
+            auto_detect_source_language_config=auto_detect_source_language_config,
         )
 
+        final_text = self._setup_continuous_recognition(speech_recognizer)
+        return final_text.strip()
+
+    def _setup_continuous_recognition(self, speech_recognizer) -> str:
+        """
+        Sets up continuous recognition for the speech recognizer and fetches the final transcribed text.
+
+        :param speech_recognizer: The speech recognizer object.
+        :return: The concatenated string of all recognized texts.
+        """
+        logger.info("Setting up continuous recognition...")
         done = False
         final_text = ""
 
         def update_final_text(evt):
             nonlocal final_text
             final_text += " " + evt.result.text
+            logger.info(f"Updated final text: {final_text}")
 
         def stop_cb(evt: speechsdk.SessionEventArgs):
-            logger.info(f"CLOSING on {evt}")
             nonlocal done
             done = True
+            logger.info(f"Stopping recognition on {evt}")
 
+        self._setup_recognition_callbacks(speech_recognizer, update_final_text, stop_cb)
+
+        logger.info("Starting continuous recognition...")
+        speech_recognizer.start_continuous_recognition()
+        while not done:
+            time.sleep(0.01)
+        logger.info("Stopping continuous recognition...")
+        speech_recognizer.stop_continuous_recognition()
+
+        return final_text
+
+    def _setup_recognition_callbacks(
+        self, speech_recognizer, update_final_text, stop_cb
+    ):
+        """
+        Sets up various callbacks for the speech recognizer events.
+
+        :param speech_recognizer: The speech recognizer object.
+        :param update_final_text: Callback function for updating final text.
+        :param stop_cb: Callback function for stopping recognition.
+        """
+        logger.info("Setting up recognition callbacks...")
         speech_recognizer.recognizing.connect(
             lambda evt: logger.info(f"RECOGNIZING: {evt}")
+        )
+        speech_recognizer.recognized.connect(
+            lambda evt: logger.info(
+                f"RECOGNIZED: {evt.result.text}, Language: {evt.result.language}"
+            )
         )
         speech_recognizer.recognized.connect(update_final_text)
         speech_recognizer.session_started.connect(
@@ -203,22 +335,19 @@ class SpeechTranscriber:
             lambda evt: logger.info(f"SESSION STOPPED {evt}")
         )
         speech_recognizer.canceled.connect(lambda evt: logger.info(f"CANCELED {evt}"))
+        speech_recognizer.canceled.connect(
+            lambda evt: logger.error(f"RECOGNITION CANCELED: {evt.result.reason}")
+        )
         speech_recognizer.session_stopped.connect(stop_cb)
         speech_recognizer.canceled.connect(stop_cb)
 
-        speech_recognizer.start_continuous_recognition()
-        while not done:
-            time.sleep(0.01)
-        speech_recognizer.stop_continuous_recognition()
-
-        try:
-            os.remove(temp_file.name)
-        except OSError as e:
-            logger.warning(f"Error deleting temporary file: {e}")
-
-        return final_text.strip()
-
-    def speech_recognition_with_push_stream(self, audio_file: str, language: str = None, source_language_config: speechsdk.SourceLanguageConfig = None, auto_detect_source_language_config: speechsdk.AutoDetectSourceLanguageConfig = None):
+    def speech_recognition_with_push_stream(
+        self,
+        audio_file: str,
+        language: str = None,
+        source_language_config: speechsdk.SourceLanguageConfig = None,
+        auto_detect_source_language_config: speechsdk.AutoDetectSourceLanguageConfig = None,
+    ):
         """
         Recognizes speech from a custom audio source using a push audio stream.
         Converts stereo audio to mono in real-time before pushing it to the stream.
@@ -236,11 +365,11 @@ class SpeechTranscriber:
             stream = speechsdk.audio.PushAudioInputStream()
             audio_config = speechsdk.audio.AudioConfig(stream=stream)
             speech_recognizer = speechsdk.SpeechRecognizer(
-                speech_config=speech_config, 
+                speech_config=speech_config,
                 audio_config=audio_config,
                 language=language,
                 source_language_config=source_language_config,
-                auto_detect_source_language_config=auto_detect_source_language_config
+                auto_detect_source_language_config=auto_detect_source_language_config,
             )
 
             done = False

@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+
 class SpeechSynthesizer:
     def __init__(self, key: str = None, region: str = None):
         self.key = key if key is not None else os.getenv("SPEECH_KEY")

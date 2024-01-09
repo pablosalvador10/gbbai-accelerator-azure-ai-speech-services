@@ -6,9 +6,9 @@ from datetime import datetime
 import streamlit as st
 
 from src.aoai.intent_azure_openai import AzureOpenAIAssistant
+from src.helpers.azure_blob import AzureBlobManager
 from src.speech.speech_to_text import SpeechTranscriber
 from src.speech.text_to_speech import SpeechSynthesizer
-from utils.azure_blob import AzureBlobManager
 from utils.ml_logging import get_logger
 
 # Set up logger and environment variables
@@ -59,9 +59,9 @@ def transcribe_with_progress(
     :return: Transcribed text.
     """
     with st.spinner(f"🤖 Transcribing {file_name}... Please wait."):
-        transcribed_text = st.session_state["az_speech_manager"].transcribe_speech_from_file_continuous(
-            file_path, key, region
-        )
+        transcribed_text = st.session_state[
+            "az_speech_manager"
+        ].transcribe_speech_from_file_continuous(file_path, key, region)
     return transcribed_text
 
 
@@ -119,6 +119,7 @@ def clear_filename_history(file_name: str):
 
 #     return file_path
 
+
 def save_uploaded_file(uploaded_file) -> str:
     """
     Save an uploaded file to a specified directory.
@@ -139,6 +140,7 @@ def save_uploaded_file(uploaded_file) -> str:
     st.session_state["az_blob_manager"].write_object(path, uploaded_file.getbuffer())
 
     return path
+
 
 # UI setup
 st.markdown(
@@ -235,7 +237,9 @@ for uploaded_file in uploaded_files:
 
         col1, col2, col3 = st.columns(3)
         if col1.button("🔊 Generate Speech", key=f"synthesize_{file_name}"):
-            st.session_state["az_synthesizer_manager"].synthesize_speech(text_display, SPEECH_KEY, SPEECH_REGION)
+            st.session_state["az_synthesizer_manager"].synthesize_speech(
+                text_display, SPEECH_KEY, SPEECH_REGION
+            )
         if col2.button("📝 Summarize Text", key=f"summarize_{file_name}"):
             text = summarize(st.session_state["transcribed_texts"][file_name])
             st.text_area(

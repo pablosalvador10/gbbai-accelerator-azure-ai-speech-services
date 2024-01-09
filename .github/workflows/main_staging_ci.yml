@@ -17,7 +17,7 @@ jobs:
       - name: Setup Conda 🔧
         uses: conda-incubator/setup-miniconda@v2
         with:
-          environment-file: speech-ai-azure-services  # Create an environment.yml file
+          environment-file: speech-ai-azure-services  # Create an environment.yaml file
           activate-environment: 
           auto-activate-base: false
 

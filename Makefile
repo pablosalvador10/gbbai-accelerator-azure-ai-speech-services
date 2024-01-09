@@ -1,5 +1,5 @@
 PYTHON_INTERPRETER = python3
-CONDA_ENV ?= my-template-environment
+CONDA_ENV ?= speech-ai-azure-services
 export PYTHONPATH=$(PWD):$PYTHONPATH;
 
 # Target for setting up pre-commit and pre-push hooks
@@ -70,7 +70,7 @@ run_pylint:
 
 create_conda_env:
 	@echo "Creating conda environment"
-	conda env create -f environment.yml
+	conda env create -f environment.yaml
 
 test_speech_to_text_raw_file: 
 	@echo "Runnng speech to text services using Azure AI speech services"
