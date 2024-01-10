@@ -4,13 +4,12 @@ from typing import Optional
 import azure.cognitiveservices.speech as speechsdk
 from azure.cognitiveservices.speech import SpeechConfig, SpeechSynthesisResult
 from azure.cognitiveservices.speech.audio import AudioOutputConfig
+from dotenv import load_dotenv
 
 from utils.ml_logging import get_logger
 
 # Set up logger
 logger = get_logger()
-
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()

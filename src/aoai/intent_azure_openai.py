@@ -128,7 +128,7 @@ class AzureOpenAIAssistant:
                 messages=messages_for_api,
                 temperature=temperature,
                 max_tokens=max_tokens,
-                seed=42,
+                seed=seed,
             )
 
             response_content = response["choices"][0]["message"]["content"]
@@ -176,7 +176,9 @@ class AzureOpenAIAssistant:
                 conversation_history=[],
                 latest_prompt=text,
                 system_message_content=system_message_content,
-                max_tokens=300,
+                max_tokens=max_tokens,
+                temperature=temperature,
+                seed=seed,
             )
 
             logger.info(
